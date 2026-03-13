@@ -7,10 +7,10 @@ const Footer = () => (
       <div className="flex flex-col md:flex-row justify-between gap-10">
         <div>
           <div className="text-3xl font-black font-[family-name:var(--font-display)] tracking-tight text-foreground uppercase">
-            Subverso
+            Espectro
           </div>
           <p className="mt-3 text-muted-foreground text-sm max-w-xs leading-relaxed">
-            Uma revista de literatura, pensamento e cultura. Publicamos ensaios, poesia, ficção e resenhas.
+            Uma editora de literatura, pensamento e cultura. Publicamos ensaios, poesia, ficção e resenhas.
           </p>
         </div>
         <div className="flex items-start gap-8 text-xs uppercase tracking-widest text-muted-foreground">
