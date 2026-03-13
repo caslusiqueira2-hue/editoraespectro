@@ -14,8 +14,6 @@ const AdminPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
 
   if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Carregando…</div>;
 
