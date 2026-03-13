@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import ArtigoPage from "./pages/ArtigoPage";
 import CategoriaPage from "./pages/CategoriaPage";
 import EnvioPage from "./pages/EnvioPage";
+import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/artigo/:slug" element={<ArtigoPage />} />
           <Route path="/categoria/:slug" element={<CategoriaPage />} />
           <Route path="/envio" element={<EnvioPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
