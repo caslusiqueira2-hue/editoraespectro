@@ -66,6 +66,8 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const [editing, setEditing] = useState<Post | null>(null);
   const [creating, setCreating] = useState(false);
   const deletePost = useDeletePost();
+  const { data: envioVisible } = useSiteSetting("envio_page_visible");
+  const updateSetting = useUpdateSiteSetting();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
