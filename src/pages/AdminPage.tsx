@@ -307,22 +307,14 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
           className="w-full mt-3 text-lg font-[family-name:var(--font-display)] bg-transparent outline-none text-muted-foreground placeholder:text-muted-foreground/40"
         />
 
-        {/* Author chip */}
-        <div className="mt-5 flex items-center gap-2 flex-wrap">
-          {autor && (
-            <span className="inline-flex items-center gap-1.5 bg-secondary text-foreground text-sm px-3 py-1.5 rounded-full">
-              {autor}
-              <button onClick={() => setAutor("")} className="text-muted-foreground hover:text-foreground"><X size={14} /></button>
-            </span>
-          )}
-          {!autor && (
-            <input
-              value={autor}
-              onChange={(e) => setAutor(e.target.value)}
-              placeholder="Nome do autor"
-              className="bg-transparent outline-none text-sm text-muted-foreground placeholder:text-muted-foreground/40"
-            />
-          )}
+        {/* Author */}
+        <div className="mt-5">
+          <input
+            value={autor}
+            onChange={(e) => setAutor(e.target.value)}
+            placeholder="Nome do autor"
+            className="w-full bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground/40 border-b border-border pb-2 focus:border-accent transition-colors"
+          />
         </div>
 
         {/* Meta row */}
