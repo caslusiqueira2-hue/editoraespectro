@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePosts, useCategories, useCreatePost, useUpdatePost, useDeletePost, uploadPostImage } from "@/hooks/usePosts";
+import { useSiteSetting, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
 import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
 
 const ADMIN_EMAIL = "christianlucas12@gmail.com";
