@@ -45,7 +45,6 @@ const AdminPage = () => {
     );
   }
 
-  // Only allow admin email
   if (user.email !== ADMIN_EMAIL) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -71,25 +70,27 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border px-4 md:px-8 py-4 flex items-center justify-between max-w-7xl mx-auto">
-        <h1 className="font-[family-name:var(--font-display)] text-2xl font-black uppercase">Admin — Espectro</h1>
-        <div className="flex gap-3">
-          <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 border border-border text-foreground px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-secondary transition-colors">
-            <Eye size={16} /> Ver site
-          </a>
-          <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity">
-            <Plus size={16} /> Novo post
-          </button>
-          <button onClick={onSignOut} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Sair">
-            <LogOut size={20} />
-          </button>
+      <header className="border-b border-border px-4 md:px-8 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <h1 className="font-[family-name:var(--font-display)] text-xl sm:text-2xl font-black uppercase">Admin — Espectro</h1>
+          <div className="flex flex-wrap gap-2">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 border border-border text-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-secondary transition-colors">
+              <Eye size={16} /> <span className="hidden xs:inline">Ver site</span>
+            </a>
+            <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity">
+              <Plus size={16} /> Novo post
+            </button>
+            <button onClick={onSignOut} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Sair">
+              <LogOut size={20} />
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Settings bar */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
-        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4">
-          <FileText size={16} className="text-muted-foreground" />
+        <div className="bg-card border border-border rounded-xl p-4 flex flex-wrap items-center gap-3 sm:gap-4">
+          <FileText size={16} className="text-muted-foreground shrink-0" />
           <span className="text-sm text-foreground font-medium">Página "Envio de Originais"</span>
           <button
             onClick={() => {
@@ -97,7 +98,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
               updateSetting.mutate({ key: "envio_page_visible", value: newVal });
               toast.success(newVal ? "Página de envio visível" : "Página de envio oculta");
             }}
-            className={`ml-auto text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-all ${
+            className={`sm:ml-auto text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-all ${
               envioVisible !== false
                 ? "bg-accent/15 text-accent border border-accent/30"
                 : "bg-secondary text-muted-foreground border border-border"
@@ -114,9 +115,9 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
         ) : (
           <div className="space-y-3">
             {posts?.map((post) => (
-              <div key={post.id} className="bg-card border border-border rounded-xl p-5 flex items-center justify-between gap-4">
+              <div key={post.id} className="bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     {post.destaque && <Star size={14} className="text-accent" />}
                     {post.published ? (
                       <span className="text-[10px] font-bold uppercase tracking-wider text-green-400 flex items-center gap-1"><Eye size={12} /> Publicado</span>
@@ -125,10 +126,10 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
                     )}
                     <span className="text-[10px] uppercase tracking-wider text-muted-foreground">· {post.categories?.nome}</span>
                   </div>
-                  <h3 className="font-[family-name:var(--font-display)] text-lg font-bold truncate">{post.titulo}</h3>
+                  <h3 className="font-[family-name:var(--font-display)] text-base sm:text-lg font-bold truncate">{post.titulo}</h3>
                   <p className="text-sm text-muted-foreground truncate">{post.resumo}</p>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex gap-2 shrink-0 self-end sm:self-center">
                   <button onClick={() => setEditing(post)} className="p-2 hover:bg-secondary rounded-lg transition-colors" aria-label="Editar">
                     <Pencil size={16} />
                   </button>
@@ -168,7 +169,6 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
   const updatePost = useUpdatePost();
   const isEditing = !!post;
 
-  // Convert old array content to HTML if needed
   const initialHtml = (() => {
     if (!post?.conteudo) return "";
     if (typeof post.conteudo === "string") return post.conteudo;
@@ -248,33 +248,33 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
     <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
       {/* Top bar */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
             <X size={20} />
           </button>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+            <label className="flex items-center gap-1.5 cursor-pointer text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
               <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)}
                 className="w-3.5 h-3.5 rounded border-border accent-accent" />
               Publicar
             </label>
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+            <label className="flex items-center gap-1.5 cursor-pointer text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
               <input type="checkbox" checked={destaque} onChange={(e) => setDestaque(e.target.checked)}
                 className="w-3.5 h-3.5 rounded border-border accent-accent" />
               Destaque
             </label>
             <button onClick={handleSave} disabled={saving}
-              className="bg-accent text-accent-foreground px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50">
+              className="bg-accent text-accent-foreground px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap">
               {saving ? "Salvando…" : isEditing ? "Atualizar" : "Publicar"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Substack-style editor body */}
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      {/* Editor body */}
+      <div className="max-w-3xl mx-auto px-4 py-6 sm:py-10">
         {/* Cover image */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           {imagemUrl ? (
             <div className="relative group">
               <img src={imagemUrl} alt="Capa" className="w-full aspect-[16/9] object-cover rounded-xl" />
@@ -284,19 +284,19 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
               </button>
             </div>
           ) : (
-            <label className="flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-xl py-10 cursor-pointer text-muted-foreground hover:border-accent hover:text-accent transition-colors text-sm">
+            <label className="flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-xl py-8 sm:py-10 cursor-pointer text-muted-foreground hover:border-accent hover:text-accent transition-colors text-sm">
               <Upload size={18} /> {uploading ? "Enviando…" : "Adicionar imagem de capa"}
               <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
             </label>
           )}
         </div>
 
-        {/* Title — Substack style */}
+        {/* Title */}
         <input
           value={titulo}
           onChange={(e) => { setTitulo(e.target.value); if (!isEditing) setSlug(generateSlug(e.target.value)); }}
           placeholder="Título"
-          className="w-full text-4xl md:text-5xl font-black font-[family-name:var(--font-display)] bg-transparent outline-none text-foreground placeholder:text-muted-foreground/40 uppercase leading-tight"
+          className="w-full text-2xl sm:text-4xl md:text-5xl font-black font-[family-name:var(--font-display)] bg-transparent outline-none text-foreground placeholder:text-muted-foreground/40 uppercase leading-tight"
         />
 
         {/* Subtitle */}
@@ -304,7 +304,7 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
           value={subtitulo}
           onChange={(e) => setSubtitulo(e.target.value)}
           placeholder="Adicione um subtítulo…"
-          className="w-full mt-3 text-lg font-[family-name:var(--font-display)] bg-transparent outline-none text-muted-foreground placeholder:text-muted-foreground/40"
+          className="w-full mt-3 text-base sm:text-lg font-[family-name:var(--font-display)] bg-transparent outline-none text-muted-foreground placeholder:text-muted-foreground/40"
         />
 
         {/* Author */}
@@ -318,7 +318,7 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
         </div>
 
         {/* Meta row */}
-        <div className="mt-6 grid grid-cols-2 gap-4">
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="text-[10px] font-bold uppercase tracking-[3px] text-muted-foreground block mb-2">Slug</label>
             <input value={slug} onChange={(e) => setSlug(e.target.value)}

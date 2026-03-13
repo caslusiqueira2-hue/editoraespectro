@@ -26,17 +26,17 @@ const Footer = () => {
 
   return (
     <footer className="border-t border-border bg-background mt-0">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-16">
-        <div className="flex flex-col md:flex-row justify-between gap-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 sm:py-16">
+        <div className="flex flex-col md:flex-row justify-between gap-8 sm:gap-10">
           <div>
-            <div className="text-3xl font-black font-[family-name:var(--font-display)] tracking-tight text-foreground uppercase">
+            <div className="text-2xl sm:text-3xl font-black font-[family-name:var(--font-display)] tracking-tight text-foreground uppercase">
               Espectro
             </div>
             <p className="mt-3 text-muted-foreground text-sm max-w-xs leading-relaxed">
               Uma editora de literatura, pensamento e cultura. Publicamos ensaios, poesia, ficção e resenhas.
             </p>
           </div>
-          <div className="flex items-start gap-8 text-xs uppercase tracking-widest text-muted-foreground">
+          <div className="flex items-start gap-6 sm:gap-8 text-xs uppercase tracking-widest text-muted-foreground">
             <Link to="/envio" className="hover:text-accent transition-colors">
               Envio
             </Link>
@@ -54,7 +54,7 @@ const Footer = () => {
             </a>
           </div>
         </div>
-        <div className="mt-12 pt-6 border-t border-border text-[10px] text-muted-foreground text-center uppercase tracking-[3px]">
+        <div className="mt-10 sm:mt-12 pt-6 border-t border-border text-[10px] text-muted-foreground text-center uppercase tracking-[3px]">
           Editora Espectro ©{" "}
           <span onClick={handleYearClick} className="cursor-default select-none">
             2026
