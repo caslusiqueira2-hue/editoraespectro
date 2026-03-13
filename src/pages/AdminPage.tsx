@@ -74,6 +74,9 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
       <header className="border-b border-border px-4 md:px-8 py-4 flex items-center justify-between max-w-7xl mx-auto">
         <h1 className="font-[family-name:var(--font-display)] text-2xl font-black uppercase">Admin — Espectro</h1>
         <div className="flex gap-3">
+          <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 border border-border text-foreground px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-secondary transition-colors">
+            <Eye size={16} /> Ver site
+          </a>
           <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity">
             <Plus size={16} /> Novo post
           </button>
