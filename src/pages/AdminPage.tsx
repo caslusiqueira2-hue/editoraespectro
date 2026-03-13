@@ -8,10 +8,12 @@ import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, Image as Image
 const ADMIN_EMAIL = "christianlucas12@gmail.com";
 
 const AdminPage = () => {
-  const { user, loading: authLoading, signIn, signOut } = useAuth();
+  const { user, loading: authLoading, signIn, signUp, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Carregando…</div>;
 
@@ -24,8 +26,15 @@ const AdminPage = () => {
             onSubmit={async (e) => {
               e.preventDefault();
               setAuthError("");
-              const { error } = await signIn(email, password);
-              if (error) setAuthError(error.message);
+              setSuccessMsg("");
+              if (isSignUp) {
+                const { error } = await signUp(email, password);
+                if (error) setAuthError(error.message);
+                else setSuccessMsg("Conta criada com sucesso! Faça login.");
+              } else {
+                const { error } = await signIn(email, password);
+                if (error) setAuthError(error.message);
+              }
             }}
             className="space-y-4"
           >
@@ -34,10 +43,15 @@ const AdminPage = () => {
             <input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-secondary text-foreground px-4 py-3 rounded-lg border border-border outline-none focus:ring-2 focus:ring-accent" />
             {authError && <p className="text-destructive text-sm">{authError}</p>}
+            {successMsg && <p className="text-green-400 text-sm">{successMsg}</p>}
             <button type="submit" className="w-full bg-accent text-accent-foreground py-3 rounded-lg font-bold uppercase tracking-wider text-sm hover:opacity-90 transition-opacity">
-              Entrar
+              {isSignUp ? "Criar conta" : "Entrar"}
             </button>
           </form>
+          <button onClick={() => { setIsSignUp(!isSignUp); setAuthError(""); setSuccessMsg(""); }}
+            className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors">
+            {isSignUp ? "Já tem conta? Entrar" : "Criar uma conta"}
+          </button>
         </div>
       </div>
     );
