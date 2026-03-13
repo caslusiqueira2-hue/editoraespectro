@@ -63,8 +63,9 @@
   }
 }
 
-/* Drop cap */
-.drop-cap {
+/* Drop cap — works everywhere via .has-dropcap class */
+p.has-dropcap::first-letter,
+.prose-editor p.has-dropcap::first-letter {
   float: left;
   font-size: 5.5rem;
   line-height: 0.75;
@@ -72,29 +73,7 @@
   padding-top: 0.06em;
   font-weight: 400;
   color: hsl(var(--foreground));
-  font-family: inherit;
-}
-
-/* Drop cap inside editor */
-.prose-editor .drop-cap-paragraph::first-letter {
-  float: left;
-  font-size: 5.5rem;
-  line-height: 0.75;
-  padding-right: 0.12em;
-  padding-top: 0.06em;
-  font-weight: 400;
-  color: hsl(var(--foreground));
-}
-
-/* Article drop cap */
-.article-content p.has-dropcap::first-letter {
-  float: left;
-  font-size: 5.5rem;
-  line-height: 0.75;
-  padding-right: 0.12em;
-  padding-top: 0.06em;
-  font-weight: 400;
-  color: hsl(var(--foreground));
+  font-family: 'Playfair Display', serif;
 }
 
 /* Custom scrollbar */
