@@ -7,15 +7,36 @@ import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
+import { Node, mergeAttributes } from "@tiptap/core";
 import { useCallback, useRef } from "react";
 import { uploadPostImage } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   Code, Link as LinkIcon, Image as ImageIcon, Quote,
-  List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
-  Heading1, Heading2, Heading3, Minus, Undo, Redo, LetterText,
+  List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Minus, Undo, Redo, LetterText,
 } from "lucide-react";
+
+// Custom paragraph node that supports a "class" attribute for drop cap
+const CustomParagraph = Node.create({
+  name: "paragraph",
+  priority: 1000,
+  group: "block",
+  content: "inline*",
+  addAttributes() {
+    return {
+      class: { default: null, parseHTML: (el) => el.getAttribute("class") || null, renderHTML: (attrs) => attrs.class ? { class: attrs.class } : {} },
+      textAlign: { default: null },
+    };
+  },
+  parseHTML() { return [{ tag: "p" }]; },
+  renderHTML({ node, HTMLAttributes }) {
+    const align = node.attrs.textAlign;
+    const style = align ? { style: `text-align: ${align}` } : {};
+    return ["p", mergeAttributes(HTMLAttributes, style), 0];
+  },
+});
 
 const FONT_OPTIONS = [
   { label: "Merriweather", value: "Merriweather" },
@@ -37,7 +58,9 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
+        paragraph: false, // disable default, use custom
       }),
+      CustomParagraph,
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-accent underline" } }),
       Underline,
@@ -86,17 +109,28 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
   const toggleDropCap = useCallback(() => {
     if (!editor) return;
     const { from } = editor.state.selection;
-    const node = editor.state.doc.resolve(from).parent;
+    const resolved = editor.state.doc.resolve(from);
+    const node = resolved.parent;
+
+    if (node.type.name !== "paragraph") {
+      toast.error("Posicione o cursor em um parágrafo");
+      return;
+    }
+
     const currentClass = node.attrs.class || "";
-    const hasDropCap = currentClass.includes("drop-cap-paragraph");
+    const hasDropCap = currentClass.includes("has-dropcap");
 
     editor.chain().focus().updateAttributes("paragraph", {
-      class: hasDropCap ? "" : "drop-cap-paragraph",
+      class: hasDropCap ? null : "has-dropcap",
     }).run();
-    onChange(editor.getHTML());
-  }, [editor, onChange]);
+  }, [editor]);
 
   if (!editor) return null;
+
+  // Check if current paragraph has dropcap
+  const { from } = editor.state.selection;
+  const currentNode = editor.state.doc.resolve(from).parent;
+  const isDropCapActive = currentNode.type.name === "paragraph" && (currentNode.attrs.class || "").includes("has-dropcap");
 
   const currentFont = editor.getAttributes("textStyle").fontFamily || "";
 
@@ -178,9 +212,10 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
         <ToolBtn active={editor.isActive({ textAlign: "left" })} onClick={() => editor.chain().focus().setTextAlign("left").run()} title="Alinhar à esquerda"><AlignLeft size={16} /></ToolBtn>
         <ToolBtn active={editor.isActive({ textAlign: "center" })} onClick={() => editor.chain().focus().setTextAlign("center").run()} title="Centralizar"><AlignCenter size={16} /></ToolBtn>
         <ToolBtn active={editor.isActive({ textAlign: "right" })} onClick={() => editor.chain().focus().setTextAlign("right").run()} title="Alinhar à direita"><AlignRight size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive({ textAlign: "justify" })} onClick={() => editor.chain().focus().setTextAlign("justify").run()} title="Justificar"><AlignJustify size={16} /></ToolBtn>
         <div className="w-px h-6 bg-border mx-1" />
 
-        <ToolBtn onClick={toggleDropCap} title="Capitular (letra grande inicial)"><LetterText size={16} /></ToolBtn>
+        <ToolBtn active={isDropCapActive} onClick={toggleDropCap} title="Capitular (letra grande inicial)"><LetterText size={16} /></ToolBtn>
       </div>
 
       {/* Editor area */}
