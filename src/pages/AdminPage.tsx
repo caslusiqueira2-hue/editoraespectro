@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePosts, useCategories, useCreatePost, useUpdatePost, useDeletePost, uploadPostImage } from "@/hooks/usePosts";
+import { useSiteSetting, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
 import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
 
 const ADMIN_EMAIL = "christianlucas12@gmail.com";
@@ -13,8 +14,6 @@ const AdminPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
 
   if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Carregando…</div>;
 
@@ -27,15 +26,8 @@ const AdminPage = () => {
             onSubmit={async (e) => {
               e.preventDefault();
               setAuthError("");
-              setSuccessMsg("");
-              if (isSignUp) {
-                const { error } = await signUp(email, password);
-                if (error) setAuthError(error.message);
-                else setSuccessMsg("Conta criada com sucesso! Faça login.");
-              } else {
-                const { error } = await signIn(email, password);
-                if (error) setAuthError(error.message);
-              }
+              const { error } = await signIn(email, password);
+              if (error) setAuthError(error.message);
             }}
             className="space-y-4"
           >
@@ -44,15 +36,10 @@ const AdminPage = () => {
             <input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-secondary text-foreground px-4 py-3 rounded-lg border border-border outline-none focus:ring-2 focus:ring-accent" />
             {authError && <p className="text-destructive text-sm">{authError}</p>}
-            {successMsg && <p className="text-green-400 text-sm">{successMsg}</p>}
             <button type="submit" className="w-full bg-accent text-accent-foreground py-3 rounded-lg font-bold uppercase tracking-wider text-sm hover:opacity-90 transition-opacity">
-              {isSignUp ? "Criar conta" : "Entrar"}
+              Entrar
             </button>
           </form>
-          <button onClick={() => { setIsSignUp(!isSignUp); setAuthError(""); setSuccessMsg(""); }}
-            className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors">
-            {isSignUp ? "Já tem conta? Entrar" : "Criar uma conta"}
-          </button>
         </div>
       </div>
     );
@@ -79,6 +66,8 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const [editing, setEditing] = useState<Post | null>(null);
   const [creating, setCreating] = useState(false);
   const deletePost = useDeletePost();
+  const { data: envioVisible } = useSiteSetting("envio_page_visible");
+  const updateSetting = useUpdateSiteSetting();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -93,6 +82,28 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
           </button>
         </div>
       </header>
+
+      {/* Settings bar */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
+        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4">
+          <FileText size={16} className="text-muted-foreground" />
+          <span className="text-sm text-foreground font-medium">Página "Envio de Originais"</span>
+          <button
+            onClick={() => {
+              const newVal = !envioVisible;
+              updateSetting.mutate({ key: "envio_page_visible", value: newVal });
+              toast.success(newVal ? "Página de envio visível" : "Página de envio oculta");
+            }}
+            className={`ml-auto text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-all ${
+              envioVisible !== false
+                ? "bg-accent/15 text-accent border border-accent/30"
+                : "bg-secondary text-muted-foreground border border-border"
+            }`}
+          >
+            {envioVisible !== false ? "Visível" : "Oculta"}
+          </button>
+        </div>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         {isLoading ? (

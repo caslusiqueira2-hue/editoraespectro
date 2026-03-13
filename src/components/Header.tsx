@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, X, Menu } from "lucide-react";
 import { usePosts, useCategories } from "@/hooks/usePosts";
+import { useSiteSetting } from "@/hooks/useSiteSettings";
 
 const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -10,6 +11,7 @@ const Header = () => {
   const navigate = useNavigate();
   const { data: posts } = usePosts(true);
   const { data: categories } = useCategories();
+  const { data: envioVisible } = useSiteSetting("envio_page_visible");
 
   const navCategories = categories?.filter(c => c.slug !== "") || [];
 
@@ -84,9 +86,11 @@ const Header = () => {
               <button onClick={() => setSearchOpen(true)} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Buscar">
                 <Search size={18} />
               </button>
-              <Link to="/envio" className="bg-accent text-accent-foreground text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
-                Enviar texto
-              </Link>
+              {envioVisible !== false && (
+                <Link to="/envio" className="bg-accent text-accent-foreground text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
+                  Enviar texto
+                </Link>
+              )}
             </div>
 
             <div className="flex md:hidden items-center gap-2 ml-auto">
@@ -115,10 +119,12 @@ const Header = () => {
                 {cat.nome}
               </Link>
             ))}
-            <Link to="/envio" onClick={() => setMenuOpen(false)}
-              className="block mt-4 bg-accent text-accent-foreground text-sm font-bold px-4 py-3 rounded-full text-center uppercase tracking-wider">
-              Enviar texto
-            </Link>
+            {envioVisible !== false && (
+              <Link to="/envio" onClick={() => setMenuOpen(false)}
+                className="block mt-4 bg-accent text-accent-foreground text-sm font-bold px-4 py-3 rounded-full text-center uppercase tracking-wider">
+                Enviar texto
+              </Link>
+            )}
           </div>
         )}
       </header>
