@@ -66,13 +66,35 @@
 /* Drop cap */
 .drop-cap {
   float: left;
-  font-family: var(--font-display);
-  font-size: 4rem;
-  line-height: 0.8;
-  padding-right: 0.15em;
-  padding-top: 0.08em;
-  font-weight: 700;
-  color: hsl(var(--accent));
+  font-size: 5.5rem;
+  line-height: 0.75;
+  padding-right: 0.12em;
+  padding-top: 0.06em;
+  font-weight: 400;
+  color: hsl(var(--foreground));
+  font-family: inherit;
+}
+
+/* Drop cap inside editor */
+.prose-editor .drop-cap-paragraph::first-letter {
+  float: left;
+  font-size: 5.5rem;
+  line-height: 0.75;
+  padding-right: 0.12em;
+  padding-top: 0.06em;
+  font-weight: 400;
+  color: hsl(var(--foreground));
+}
+
+/* Article drop cap */
+.article-content p.has-dropcap::first-letter {
+  float: left;
+  font-size: 5.5rem;
+  line-height: 0.75;
+  padding-right: 0.12em;
+  padding-top: 0.06em;
+  font-weight: 400;
+  color: hsl(var(--foreground));
 }
 
 /* Custom scrollbar */
