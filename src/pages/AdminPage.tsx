@@ -154,15 +154,32 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
   const updatePost = useUpdatePost();
   const isEditing = !!post;
 
+  // Convert old array content to HTML if needed
+  const initialHtml = (() => {
+    if (!post?.conteudo) return "";
+    if (typeof post.conteudo === "string") return post.conteudo;
+    if (Array.isArray(post.conteudo)) {
+      return (post.conteudo as string[]).map(block => {
+        if (typeof block === "string" && block.startsWith("[IMG]")) {
+          const url = block.replace("[IMG]", "").replace("[/IMG]", "");
+          return `<img src="${url}" />`;
+        }
+        if (typeof block === "string" && block.startsWith("**") && block.endsWith("**")) {
+          return `<p><strong>${block.replace(/\*\*/g, "")}</strong></p>`;
+        }
+        return `<p>${block}</p>`;
+      }).join("");
+    }
+    return "";
+  })();
+
   const [titulo, setTitulo] = useState(post?.titulo || "");
   const [subtitulo, setSubtitulo] = useState(post?.subtitulo || "");
   const [slug, setSlug] = useState(post?.slug || "");
   const [autor, setAutor] = useState(post?.autor || "");
   const [categoriaId, setCategoriaId] = useState(post?.categoria_id || "");
   const [resumo, setResumo] = useState(post?.resumo || "");
-  const [conteudo, setConteudo] = useState<string[]>(
-    Array.isArray(post?.conteudo) ? (post.conteudo as string[]) : []
-  );
+  const [conteudoHtml, setConteudoHtml] = useState(initialHtml);
   const [imagemUrl, setImagemUrl] = useState(post?.imagem_url || "");
   const [published, setPublished] = useState(post?.published || false);
   const [destaque, setDestaque] = useState(post?.destaque || false);
@@ -172,7 +189,7 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
   const generateSlug = (text: string) =>
     text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
@@ -180,23 +197,6 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
       const url = await uploadPostImage(file);
       setImagemUrl(url);
       toast.success("Imagem enviada");
-    } catch (err: any) {
-      toast.error("Erro ao enviar imagem: " + err.message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleContentImageInsert = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const url = await uploadPostImage(file);
-      const updated = [...conteudo];
-      updated.splice(index + 1, 0, `[IMG]${url}[/IMG]`);
-      setConteudo(updated);
-      toast.success("Imagem inserida no conteúdo");
     } catch (err: any) {
       toast.error("Erro ao enviar imagem: " + err.message);
     } finally {
@@ -213,7 +213,7 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
     try {
       const payload = {
         titulo, subtitulo: subtitulo || null, slug, autor, categoria_id: categoriaId,
-        resumo, conteudo: conteudo as any, imagem_url: imagemUrl || null, published, destaque,
+        resumo, conteudo: conteudoHtml as any, imagem_url: imagemUrl || null, published, destaque,
       };
       if (isEditing) {
         await updatePost.mutateAsync({ id: post!.id, ...payload });
@@ -230,128 +230,114 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
     }
   };
 
-  const inputClass = "w-full bg-secondary text-foreground px-4 py-3 rounded-lg border border-border outline-none focus:ring-2 focus:ring-accent text-sm";
-  const labelClass = "text-[10px] font-bold uppercase tracking-[3px] text-muted-foreground block mb-2";
-
   return (
-    <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl overflow-y-auto">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-black uppercase">
-            {isEditing ? "Editar post" : "Novo post"}
-          </h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-sm uppercase tracking-wider">
-            Cancelar
+    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      {/* Top bar */}
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+            <X size={20} />
           </button>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-border accent-accent" />
+              Publicar
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
+              <input type="checkbox" checked={destaque} onChange={(e) => setDestaque(e.target.checked)}
+                className="w-3.5 h-3.5 rounded border-border accent-accent" />
+              Destaque
+            </label>
+            <button onClick={handleSave} disabled={saving}
+              className="bg-accent text-accent-foreground px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50">
+              {saving ? "Salvando…" : isEditing ? "Atualizar" : "Publicar"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Substack-style editor body */}
+      <div className="max-w-3xl mx-auto px-4 py-10">
+        {/* Cover image */}
+        <div className="mb-8">
+          {imagemUrl ? (
+            <div className="relative group">
+              <img src={imagemUrl} alt="Capa" className="w-full aspect-[16/9] object-cover rounded-xl" />
+              <button onClick={() => setImagemUrl("")}
+                className="absolute top-3 right-3 bg-background/80 text-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <X size={16} />
+              </button>
+            </div>
+          ) : (
+            <label className="flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-xl py-10 cursor-pointer text-muted-foreground hover:border-accent hover:text-accent transition-colors text-sm">
+              <Upload size={18} /> {uploading ? "Enviando…" : "Adicionar imagem de capa"}
+              <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
+            </label>
+          )}
         </div>
 
-        <div className="space-y-6">
-          {/* Title & Slug */}
-          <div>
-            <label className={labelClass}>Título *</label>
-            <input value={titulo} onChange={(e) => { setTitulo(e.target.value); if (!isEditing) setSlug(generateSlug(e.target.value)); }}
-              className={inputClass} placeholder="Título do post" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass}>Slug *</label>
-              <input value={slug} onChange={(e) => setSlug(e.target.value)} className={inputClass} placeholder="slug-do-post" />
-            </div>
-            <div>
-              <label className={labelClass}>Autor *</label>
-              <input value={autor} onChange={(e) => setAutor(e.target.value)} className={inputClass} placeholder="Nome do autor" />
-            </div>
-          </div>
-          <div>
-            <label className={labelClass}>Subtítulo</label>
-            <input value={subtitulo} onChange={(e) => setSubtitulo(e.target.value)} className={inputClass} placeholder="Subtítulo (opcional)" />
-          </div>
+        {/* Title — Substack style */}
+        <input
+          value={titulo}
+          onChange={(e) => { setTitulo(e.target.value); if (!isEditing) setSlug(generateSlug(e.target.value)); }}
+          placeholder="Título"
+          className="w-full text-4xl md:text-5xl font-black font-[family-name:var(--font-display)] bg-transparent outline-none text-foreground placeholder:text-muted-foreground/40 uppercase leading-tight"
+        />
 
-          {/* Category */}
+        {/* Subtitle */}
+        <input
+          value={subtitulo}
+          onChange={(e) => setSubtitulo(e.target.value)}
+          placeholder="Adicione um subtítulo…"
+          className="w-full mt-3 text-lg font-[family-name:var(--font-display)] bg-transparent outline-none text-muted-foreground placeholder:text-muted-foreground/40"
+        />
+
+        {/* Author chip */}
+        <div className="mt-5 flex items-center gap-2 flex-wrap">
+          {autor && (
+            <span className="inline-flex items-center gap-1.5 bg-secondary text-foreground text-sm px-3 py-1.5 rounded-full">
+              {autor}
+              <button onClick={() => setAutor("")} className="text-muted-foreground hover:text-foreground"><X size={14} /></button>
+            </span>
+          )}
+          {!autor && (
+            <input
+              value={autor}
+              onChange={(e) => setAutor(e.target.value)}
+              placeholder="Nome do autor"
+              className="bg-transparent outline-none text-sm text-muted-foreground placeholder:text-muted-foreground/40"
+            />
+          )}
+        </div>
+
+        {/* Meta row */}
+        <div className="mt-6 grid grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>Categoria *</label>
-            <select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)} className={inputClass}>
+            <label className="text-[10px] font-bold uppercase tracking-[3px] text-muted-foreground block mb-2">Slug</label>
+            <input value={slug} onChange={(e) => setSlug(e.target.value)}
+              className="w-full bg-secondary text-foreground text-sm px-3 py-2 rounded-lg border border-border outline-none focus:ring-1 focus:ring-accent" placeholder="slug-do-post" />
+          </div>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-[3px] text-muted-foreground block mb-2">Categoria</label>
+            <select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}
+              className="w-full bg-secondary text-foreground text-sm px-3 py-2 rounded-lg border border-border outline-none focus:ring-1 focus:ring-accent">
               <option value="">Selecione…</option>
               {categories?.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
           </div>
+        </div>
 
-          {/* Cover Image */}
-          <div>
-            <label className={labelClass}>Imagem de capa</label>
-            <div className="flex items-center gap-4">
-              {imagemUrl && <img src={imagemUrl} alt="Capa" className="h-24 w-36 object-cover rounded-lg border border-border" />}
-              <label className="flex items-center gap-2 bg-secondary px-4 py-3 rounded-lg cursor-pointer hover:bg-muted transition-colors text-sm">
-                <Upload size={16} /> {uploading ? "Enviando…" : "Enviar imagem"}
-                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-              </label>
-            </div>
-          </div>
+        {/* Resumo */}
+        <div className="mt-4">
+          <label className="text-[10px] font-bold uppercase tracking-[3px] text-muted-foreground block mb-2">Resumo</label>
+          <textarea value={resumo} onChange={(e) => setResumo(e.target.value)}
+            className="w-full bg-secondary text-foreground text-sm px-3 py-2 rounded-lg border border-border outline-none focus:ring-1 focus:ring-accent min-h-[60px]" placeholder="Resumo do post…" />
+        </div>
 
-          {/* Summary */}
-          <div>
-            <label className={labelClass}>Resumo *</label>
-            <textarea value={resumo} onChange={(e) => setResumo(e.target.value)} className={inputClass + " min-h-[80px]"} placeholder="Resumo do post" />
-          </div>
-
-          {/* Content blocks */}
-          <div>
-            <label className={labelClass}>Conteúdo</label>
-            <div className="space-y-3">
-              {conteudo.map((block, i) => (
-                <div key={i} className="relative group">
-                  {block.startsWith("[IMG]") ? (
-                    <div className="relative">
-                      <img src={block.replace("[IMG]", "").replace("[/IMG]", "")} alt="" className="w-full rounded-lg border border-border" />
-                      <button onClick={() => setConteudo(conteudo.filter((_, j) => j !== i))}
-                        className="absolute top-2 right-2 bg-destructive text-destructive-foreground p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <textarea value={block} onChange={(e) => { const u = [...conteudo]; u[i] = e.target.value; setConteudo(u); }}
-                        className={inputClass + " min-h-[80px] flex-1"} />
-                      <div className="flex flex-col gap-1 shrink-0">
-                        <button onClick={() => setConteudo(conteudo.filter((_, j) => j !== i))}
-                          className="p-2 text-destructive hover:bg-destructive/20 rounded-lg transition-colors" aria-label="Remover">
-                          <Trash2 size={14} />
-                        </button>
-                        <label className="p-2 text-muted-foreground hover:text-accent cursor-pointer rounded-lg hover:bg-secondary transition-colors" aria-label="Inserir imagem">
-                          <ImageIcon size={14} />
-                          <input type="file" accept="image/*" onChange={(e) => handleContentImageInsert(e, i)} className="hidden" />
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-              <button onClick={() => setConteudo([...conteudo, ""])}
-                className="w-full border-2 border-dashed border-border text-muted-foreground py-3 rounded-lg hover:border-accent hover:text-accent transition-colors text-sm uppercase tracking-wider">
-                + Adicionar parágrafo
-              </button>
-            </div>
-          </div>
-
-          {/* Toggles */}
-          <div className="flex gap-6">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)}
-                className="w-4 h-4 rounded border-border accent-accent" />
-              <span className="text-sm">Publicado</span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" checked={destaque} onChange={(e) => setDestaque(e.target.checked)}
-                className="w-4 h-4 rounded border-border accent-accent" />
-              <span className="text-sm">Destaque (hero)</span>
-            </label>
-          </div>
-
-          {/* Save */}
-          <button onClick={handleSave} disabled={saving}
-            className="w-full bg-accent text-accent-foreground py-4 rounded-lg font-bold uppercase tracking-wider text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
-            {saving ? "Salvando…" : isEditing ? "Atualizar post" : "Criar post"}
-          </button>
+        {/* Rich editor */}
+        <div className="mt-8">
+          <RichEditor content={conteudoHtml} onChange={setConteudoHtml} />
         </div>
       </div>
     </div>
