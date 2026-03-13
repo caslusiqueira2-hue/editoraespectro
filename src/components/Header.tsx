@@ -86,9 +86,11 @@ const Header = () => {
               <button onClick={() => setSearchOpen(true)} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Buscar">
                 <Search size={18} />
               </button>
-              <Link to="/envio" className="bg-accent text-accent-foreground text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
-                Enviar texto
-              </Link>
+              {envioVisible !== false && (
+                <Link to="/envio" className="bg-accent text-accent-foreground text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
+                  Enviar texto
+                </Link>
+              )}
             </div>
 
             <div className="flex md:hidden items-center gap-2 ml-auto">
