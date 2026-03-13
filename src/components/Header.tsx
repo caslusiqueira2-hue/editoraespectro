@@ -66,7 +66,7 @@ const Header = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex-shrink-0">
-              <img src={logoEspectro} alt="Espectro" className="h-8 w-auto" />
+              <img src={logoEspectro} alt="Espectro" className="h-12 w-auto" />
             </Link>
             <nav className="hidden md:flex items-center gap-1">
               {navCategories.map((cat) => (
