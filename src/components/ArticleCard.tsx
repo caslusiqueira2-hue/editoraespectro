@@ -1,7 +1,17 @@
 import { Link } from "react-router-dom";
-import { type Artigo } from "@/data/artigos";
 
-const ArticleCard = ({ artigo }: { artigo: Artigo }) => (
+interface ArticleCardProps {
+  artigo: {
+    slug: string;
+    titulo: string;
+    resumo: string;
+    categoria: string;
+    imagem: string;
+    autor: string;
+  };
+}
+
+const ArticleCard = ({ artigo }: ArticleCardProps) => (
   <article className="group">
     <Link to={`/artigo/${artigo.slug}`} className="block">
       <div className="aspect-[3/4] overflow-hidden rounded-xl bg-secondary relative">
