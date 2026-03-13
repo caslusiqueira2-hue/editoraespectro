@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Search, X, Menu } from "lucide-react";
 import { usePosts, useCategories } from "@/hooks/usePosts";
 import { useSiteSetting } from "@/hooks/useSiteSettings";
+import logoEspectro from "@/assets/logo-espectro.png";
 
 const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
