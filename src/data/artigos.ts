@@ -27,7 +27,7 @@ export const ARTIGOS: Artigo[] = [
     categoriaSlug: "ensaios",
     destaque: false,
     imagem: capaManifesto,
-    resumo: "A Revista Subverso nasce da convicção de que a palavra escrita é, antes de tudo, um ato de resistência ao óbvio e ao previsível.",
+    resumo: "A Editora Espectro nasce da convicção de que a palavra escrita é, antes de tudo, um ato de resistência ao óbvio e ao previsível.",
     conteudo: [
       "A literatura nunca foi um lugar confortável — e ainda bem.",
       "A Revista Subverso nasce da convicção de que a palavra escrita é, antes de tudo, um ato de resistência. Resistência ao óbvio, ao previsível, ao silêncio que o mundo tantas vezes nos impõe. Aqui, o verso não obedece, a prosa não se acomoda, e o pensamento recusa a linha reta.",
