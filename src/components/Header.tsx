@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Search, X, Menu } from "lucide-react";
 import { usePosts, useCategories } from "@/hooks/usePosts";
 import { useSiteSetting } from "@/hooks/useSiteSettings";
+import logoEspectro from "@/assets/logo-espectro.png";
 
 const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -64,6 +65,9 @@ const Header = () => {
       <header className="bg-background/80 backdrop-blur-md sticky top-0 z-40 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-16">
+            <Link to="/" className="flex-shrink-0">
+              <img src={logoEspectro} alt="Espectro" className="h-8 w-auto" />
+            </Link>
             <nav className="hidden md:flex items-center gap-1">
               {navCategories.map((cat) => (
                 <Link
