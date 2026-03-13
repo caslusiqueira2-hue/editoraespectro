@@ -8,7 +8,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
 import { Node, mergeAttributes } from "@tiptap/core";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useEffect } from "react";
 import { uploadPostImage } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import {
