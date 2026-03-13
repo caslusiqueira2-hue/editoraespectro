@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, X, Menu } from "lucide-react";
 import { usePosts, useCategories } from "@/hooks/usePosts";
+import { useSiteSetting } from "@/hooks/useSiteSettings";
 
 const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
