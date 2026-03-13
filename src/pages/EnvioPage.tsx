@@ -13,7 +13,7 @@ const EnvioPage = () => (
       </h1>
       <div className="space-y-5 text-base leading-[1.8] text-foreground/85">
         <p>
-          A Revista Subverso aceita submissões de textos originais e inéditos em língua portuguesa. 
+          A Editora Espectro aceita submissões de textos originais e inéditos em língua portuguesa. 
           Publicamos ensaios, artigos, poesia, contos, crônicas e resenhas.
         </p>
         <p>

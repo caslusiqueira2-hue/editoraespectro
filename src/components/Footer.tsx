@@ -32,7 +32,7 @@ const Footer = () => (
         </div>
       </div>
       <div className="mt-12 pt-6 border-t border-border text-[10px] text-muted-foreground text-center uppercase tracking-[3px]">
-        Revista Subverso © 2026
+        Editora Espectro © 2026
       </div>
     </div>
   </footer>
