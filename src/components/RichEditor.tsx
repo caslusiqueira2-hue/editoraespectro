@@ -27,14 +27,11 @@ const CustomParagraph = Node.create({
   addAttributes() {
     return {
       class: { default: null, parseHTML: (el) => el.getAttribute("class") || null, renderHTML: (attrs) => attrs.class ? { class: attrs.class } : {} },
-      textAlign: { default: null },
     };
   },
   parseHTML() { return [{ tag: "p" }]; },
-  renderHTML({ node, HTMLAttributes }) {
-    const align = node.attrs.textAlign;
-    const style = align ? { style: `text-align: ${align}` } : {};
-    return ["p", mergeAttributes(HTMLAttributes, style), 0];
+  renderHTML({ HTMLAttributes }) {
+    return ["p", mergeAttributes(HTMLAttributes), 0];
   },
 });
 
