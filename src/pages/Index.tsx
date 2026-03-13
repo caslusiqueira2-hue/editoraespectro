@@ -11,55 +11,83 @@ const heroArticle = ARTIGOS.find((a) => a.destaque) || ARTIGOS[0];
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
       {/* Hero */}
-      <section className="relative h-[70vh] min-h-[420px] overflow-hidden">
+      <section className="relative min-h-[85vh] overflow-hidden flex items-center">
+        {/* Background image */}
         <img
           src={heroArticle?.imagem || capaBV}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover scale-105"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="relative z-10 h-full flex items-end">
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+
+        <div className="relative z-10 w-full">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="max-w-6xl mx-auto px-4 pb-12 w-full"
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="max-w-7xl mx-auto px-4 md:px-8"
           >
-            <span className="inline-block text-[10px] font-bold uppercase tracking-[3px] text-accent bg-accent/20 px-2 py-0.5 rounded-sm">
+            <span className="inline-block text-[10px] font-bold uppercase tracking-[4px] text-accent mb-4">
               {heroArticle?.categoria}
             </span>
-            <h1 className="mt-3 text-3xl md:text-5xl font-black text-white leading-tight max-w-2xl">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.95] max-w-3xl uppercase">
               {heroArticle?.titulo}
             </h1>
-            <p className="mt-2 text-white/70 text-sm">
-              por {heroArticle?.autor}
+            <p className="mt-6 text-muted-foreground text-base max-w-lg leading-relaxed">
+              {heroArticle?.resumo}
             </p>
-            <Link
-              to={`/artigo/${heroArticle?.slug}`}
-              className="inline-block mt-5 bg-white/10 backdrop-blur-sm text-white border border-white/30 px-6 py-2.5 text-sm font-semibold rounded-sm hover:bg-white/20 transition-colors"
-            >
-              Leia o Artigo
-            </Link>
+            <div className="mt-8 flex items-center gap-4">
+              <Link
+                to={`/artigo/${heroArticle?.slug}`}
+                className="bg-accent text-accent-foreground px-8 py-3 text-sm font-bold uppercase tracking-wider rounded-full hover:opacity-90 transition-opacity"
+              >
+                Explorar
+              </Link>
+              <span className="text-xs text-muted-foreground uppercase tracking-widest">
+                por {heroArticle?.autor}
+              </span>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Articles Grid */}
       <main className="flex-1">
-        <section className="max-w-6xl mx-auto px-4 py-16">
-          <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold mb-10">
-            Últimas postagens
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {ARTIGOS.map((artigo) => (
-              <ArticleCard key={artigo.id} artigo={artigo} />
+        <section className="max-w-7xl mx-auto px-4 md:px-8 py-20">
+          <div className="flex items-end justify-between mb-12">
+            <motion.h2
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-5xl font-black uppercase leading-tight"
+            >
+              Últimas<br />publicações
+            </motion.h2>
+            <span className="hidden md:block text-xs text-muted-foreground uppercase tracking-widest">
+              Veja tudo →
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {ARTIGOS.map((artigo, i) => (
+              <motion.div
+                key={artigo.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+              >
+                <ArticleCard artigo={artigo} />
+              </motion.div>
             ))}
           </div>
+
           {ARTIGOS.length === 0 && (
             <p className="text-center text-muted-foreground py-20">
               Nenhum artigo publicado ainda.
