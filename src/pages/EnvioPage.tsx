@@ -18,8 +18,8 @@ const EnvioPage = () => (
         </p>
         <p>
           Para enviar seu trabalho, entre em contato pelo e-mail{" "}
-          <a href="mailto:contato@revistasubverso.com" className="text-accent hover:underline font-bold">
-            contato@revistasubverso.com
+          <a href="mailto:contato@editoraespectro.com" className="text-accent hover:underline font-bold">
+            contato@editoraespectro.com
           </a>
         </p>
         <h2 className="font-[family-name:var(--font-display)] text-xl font-bold mt-10 uppercase text-foreground">Diretrizes</h2>
