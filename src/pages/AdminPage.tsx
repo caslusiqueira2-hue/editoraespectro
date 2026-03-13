@@ -5,6 +5,8 @@ import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, Image as ImageIcon } from "lucide-react";
 
+const ADMIN_EMAIL = "christianlucas12@gmail.com";
+
 const AdminPage = () => {
   const { user, loading: authLoading, signIn, signOut } = useAuth();
   const [email, setEmail] = useState("");
@@ -36,6 +38,19 @@ const AdminPage = () => {
               Entrar
             </button>
           </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Only allow admin email
+  if (user.email !== ADMIN_EMAIL) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="text-center space-y-4">
+          <h1 className="font-[family-name:var(--font-display)] text-2xl font-black text-foreground uppercase">Acesso negado</h1>
+          <p className="text-muted-foreground text-sm">Você não tem permissão para acessar esta área.</p>
+          <button onClick={signOut} className="text-accent hover:underline text-sm">Sair</button>
         </div>
       </div>
     );
