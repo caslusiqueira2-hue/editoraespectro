@@ -5,6 +5,8 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
+import { TextStyle } from "@tiptap/extension-text-style";
+import FontFamily from "@tiptap/extension-font-family";
 import { useCallback, useRef } from "react";
 import { uploadPostImage } from "@/hooks/usePosts";
 import { toast } from "sonner";
@@ -12,8 +14,16 @@ import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   Code, Link as LinkIcon, Image as ImageIcon, Quote,
   List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
-  Heading1, Heading2, Heading3, Minus, Undo, Redo,
+  Heading1, Heading2, Heading3, Minus, Undo, Redo, LetterText,
 } from "lucide-react";
+
+const FONT_OPTIONS = [
+  { label: "Merriweather", value: "Merriweather" },
+  { label: "EB Garamond", value: "EB Garamond" },
+  { label: "Libre Baskerville", value: "Libre Baskerville" },
+  { label: "Crimson Pro", value: "Crimson Pro" },
+  { label: "Playfair Display", value: "Playfair Display" },
+];
 
 interface RichEditorProps {
   content: string;
@@ -32,6 +42,8 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-accent underline" } }),
       Underline,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
+      TextStyle,
+      FontFamily,
       Placeholder.configure({ placeholder: "Comece a escrever…" }),
     ],
     content,
@@ -71,7 +83,22 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
+  const toggleDropCap = useCallback(() => {
+    if (!editor) return;
+    const { from } = editor.state.selection;
+    const node = editor.state.doc.resolve(from).parent;
+    const currentClass = node.attrs.class || "";
+    const hasDropCap = currentClass.includes("drop-cap-paragraph");
+
+    editor.chain().focus().updateAttributes("paragraph", {
+      class: hasDropCap ? "" : "drop-cap-paragraph",
+    }).run();
+    onChange(editor.getHTML());
+  }, [editor, onChange]);
+
   if (!editor) return null;
+
+  const currentFont = editor.getAttributes("textStyle").fontFamily || "";
 
   const ToolBtn = ({ active, onClick, children, title }: { active?: boolean; onClick: () => void; children: React.ReactNode; title: string }) => (
     <button
@@ -92,6 +119,7 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
         <ToolBtn onClick={() => editor.chain().focus().redo().run()} title="Refazer"><Redo size={16} /></ToolBtn>
         <div className="w-px h-6 bg-border mx-1" />
 
+        {/* Heading select */}
         <select
           onChange={(e) => {
             const v = e.target.value;
@@ -109,6 +137,24 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
           <option value="1">Título 1</option>
           <option value="2">Título 2</option>
           <option value="3">Título 3</option>
+        </select>
+
+        {/* Font family select */}
+        <select
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v === "") editor.chain().focus().unsetFontFamily().run();
+            else editor.chain().focus().setFontFamily(v).run();
+          }}
+          value={currentFont}
+          className="bg-transparent text-muted-foreground text-xs px-2 py-1.5 rounded border border-border outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+        >
+          <option value="">Fonte padrão</option>
+          {FONT_OPTIONS.map((f) => (
+            <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+              {f.label}
+            </option>
+          ))}
         </select>
         <div className="w-px h-6 bg-border mx-1" />
 
@@ -132,6 +178,9 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
         <ToolBtn active={editor.isActive({ textAlign: "left" })} onClick={() => editor.chain().focus().setTextAlign("left").run()} title="Alinhar à esquerda"><AlignLeft size={16} /></ToolBtn>
         <ToolBtn active={editor.isActive({ textAlign: "center" })} onClick={() => editor.chain().focus().setTextAlign("center").run()} title="Centralizar"><AlignCenter size={16} /></ToolBtn>
         <ToolBtn active={editor.isActive({ textAlign: "right" })} onClick={() => editor.chain().focus().setTextAlign("right").run()} title="Alinhar à direita"><AlignRight size={16} /></ToolBtn>
+        <div className="w-px h-6 bg-border mx-1" />
+
+        <ToolBtn onClick={toggleDropCap} title="Capitular (letra grande inicial)"><LetterText size={16} /></ToolBtn>
       </div>
 
       {/* Editor area */}
