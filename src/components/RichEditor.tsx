@@ -53,6 +53,11 @@ interface RichEditorProps {
 
 export default function RichEditor({ content, onChange }: RichEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   const editor = useEditor({
     extensions: [
@@ -71,14 +76,14 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
     ],
     content,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onChangeRef.current(editor.getHTML());
     },
     editorProps: {
       attributes: {
         class: "prose-editor outline-none min-h-[400px] text-foreground",
       },
     },
-  });
+  }, []);
 
   const handleImageUpload = useCallback(async () => {
     fileInputRef.current?.click();
