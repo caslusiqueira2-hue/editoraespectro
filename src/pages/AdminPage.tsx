@@ -120,7 +120,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     {post.destaque && <Star size={14} className="text-accent" />}
                     {post.published ? (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-green-400 flex items-center gap-1"><Eye size={12} /> Publicado</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-accent flex items-center gap-1"><Eye size={12} /> Publicado</span>
                     ) : (
                       <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1"><EyeOff size={12} /> Rascunho</span>
                     )}

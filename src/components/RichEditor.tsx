@@ -150,7 +150,7 @@ export default function RichEditor({ content, onChange }: RichEditorProps) {
   return (
     <div className="border border-border rounded-xl overflow-hidden bg-card">
       {/* Toolbar */}
-      <div className="border-b border-border px-3 py-2 flex flex-wrap items-center gap-0.5 bg-secondary/50">
+      <div className="border-b border-border px-2 sm:px-3 py-2 flex flex-wrap items-center gap-0.5 bg-secondary/50 overflow-x-auto">
         <ToolBtn onClick={() => editor.chain().focus().undo().run()} title="Desfazer"><Undo size={16} /></ToolBtn>
         <ToolBtn onClick={() => editor.chain().focus().redo().run()} title="Refazer"><Redo size={16} /></ToolBtn>
         <div className="w-px h-6 bg-border mx-1" />
