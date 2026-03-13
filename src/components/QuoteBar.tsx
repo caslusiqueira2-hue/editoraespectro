@@ -6,7 +6,7 @@ const QuoteBar = () => (
         A literatura é a pergunta que o mundo nunca soube que precisava fazer.
       </blockquote>
       <cite className="block mt-6 text-xs font-semibold text-muted-foreground not-italic uppercase tracking-[3px]">
-        — Revista Subverso
+        — Editora Espectro
       </cite>
     </div>
   </div>
