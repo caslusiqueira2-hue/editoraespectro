@@ -34,7 +34,21 @@ const ArtigoPage = () => {
     );
   }
 
-  const conteudo = Array.isArray(artigo.conteudo) ? (artigo.conteudo as string[]) : [];
+  // Support both HTML string and legacy array format
+  const contentHtml = typeof artigo.conteudo === "string"
+    ? artigo.conteudo
+    : Array.isArray(artigo.conteudo)
+      ? (artigo.conteudo as string[]).map(block => {
+          if (typeof block === "string" && block.startsWith("[IMG]")) {
+            const url = block.replace("[IMG]", "").replace("[/IMG]", "");
+            return `<img src="${url}" />`;
+          }
+          if (typeof block === "string" && block.startsWith("**") && block.endsWith("**")) {
+            return `<p><strong>${block.replace(/\*\*/g, "")}</strong></p>`;
+          }
+          return `<p>${block}</p>`;
+        }).join("")
+      : "";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
