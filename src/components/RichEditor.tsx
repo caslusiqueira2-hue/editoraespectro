@@ -1,0 +1,145 @@
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import { useCallback, useRef } from "react";
+import { uploadPostImage } from "@/hooks/usePosts";
+import { toast } from "sonner";
+import {
+  Bold, Italic, Underline as UnderlineIcon, Strikethrough,
+  Code, Link as LinkIcon, Image as ImageIcon, Quote,
+  List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
+  Heading1, Heading2, Heading3, Minus, Undo, Redo,
+} from "lucide-react";
+
+interface RichEditorProps {
+  content: string;
+  onChange: (html: string) => void;
+}
+
+export default function RichEditor({ content, onChange }: RichEditorProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [1, 2, 3] },
+      }),
+      Image.configure({ inline: false, allowBase64: false }),
+      Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-accent underline" } }),
+      Underline,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Placeholder.configure({ placeholder: "Comece a escrever…" }),
+    ],
+    content,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class: "prose-editor outline-none min-h-[400px] text-foreground",
+      },
+    },
+  });
+
+  const handleImageUpload = useCallback(async () => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const onFileSelected = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editor) return;
+    try {
+      const url = await uploadPostImage(file);
+      editor.chain().focus().setImage({ src: url }).run();
+      toast.success("Imagem inserida");
+    } catch (err: any) {
+      toast.error("Erro: " + err.message);
+    }
+    e.target.value = "";
+  }, [editor]);
+
+  const setLink = useCallback(() => {
+    if (!editor) return;
+    const prev = editor.getAttributes("link").href;
+    const url = window.prompt("URL do link:", prev || "https://");
+    if (url === null) return;
+    if (url === "") { editor.chain().focus().unsetLink().run(); return; }
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+  }, [editor]);
+
+  if (!editor) return null;
+
+  const ToolBtn = ({ active, onClick, children, title }: { active?: boolean; onClick: () => void; children: React.ReactNode; title: string }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className={`p-2 rounded transition-colors ${active ? "bg-accent/20 text-accent" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+    >
+      {children}
+    </button>
+  );
+
+  return (
+    <div className="border border-border rounded-xl overflow-hidden bg-card">
+      {/* Toolbar */}
+      <div className="border-b border-border px-3 py-2 flex flex-wrap items-center gap-0.5 bg-secondary/50">
+        <ToolBtn onClick={() => editor.chain().focus().undo().run()} title="Desfazer"><Undo size={16} /></ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().redo().run()} title="Refazer"><Redo size={16} /></ToolBtn>
+        <div className="w-px h-6 bg-border mx-1" />
+
+        <select
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v === "p") editor.chain().focus().setParagraph().run();
+            else editor.chain().focus().toggleHeading({ level: Number(v) as 1 | 2 | 3 }).run();
+          }}
+          value={
+            editor.isActive("heading", { level: 1 }) ? "1" :
+            editor.isActive("heading", { level: 2 }) ? "2" :
+            editor.isActive("heading", { level: 3 }) ? "3" : "p"
+          }
+          className="bg-transparent text-muted-foreground text-xs px-2 py-1.5 rounded border border-border outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+        >
+          <option value="p">Parágrafo</option>
+          <option value="1">Título 1</option>
+          <option value="2">Título 2</option>
+          <option value="3">Título 3</option>
+        </select>
+        <div className="w-px h-6 bg-border mx-1" />
+
+        <ToolBtn active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()} title="Negrito"><Bold size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()} title="Itálico"><Italic size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive("underline")} onClick={() => editor.chain().focus().toggleUnderline().run()} title="Sublinhado"><UnderlineIcon size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive("strike")} onClick={() => editor.chain().focus().toggleStrike().run()} title="Tachado"><Strikethrough size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive("code")} onClick={() => editor.chain().focus().toggleCode().run()} title="Código"><Code size={16} /></ToolBtn>
+        <div className="w-px h-6 bg-border mx-1" />
+
+        <ToolBtn active={editor.isActive("link")} onClick={setLink} title="Link"><LinkIcon size={16} /></ToolBtn>
+        <ToolBtn onClick={handleImageUpload} title="Imagem"><ImageIcon size={16} /></ToolBtn>
+        <div className="w-px h-6 bg-border mx-1" />
+
+        <ToolBtn active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()} title="Citação"><Quote size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()} title="Lista"><List size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()} title="Lista numerada"><ListOrdered size={16} /></ToolBtn>
+        <ToolBtn onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Separador"><Minus size={16} /></ToolBtn>
+        <div className="w-px h-6 bg-border mx-1" />
+
+        <ToolBtn active={editor.isActive({ textAlign: "left" })} onClick={() => editor.chain().focus().setTextAlign("left").run()} title="Alinhar à esquerda"><AlignLeft size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive({ textAlign: "center" })} onClick={() => editor.chain().focus().setTextAlign("center").run()} title="Centralizar"><AlignCenter size={16} /></ToolBtn>
+        <ToolBtn active={editor.isActive({ textAlign: "right" })} onClick={() => editor.chain().focus().setTextAlign("right").run()} title="Alinhar à direita"><AlignRight size={16} /></ToolBtn>
+      </div>
+
+      {/* Editor area */}
+      <div className="px-6 py-8">
+        <EditorContent editor={editor} />
+      </div>
+
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileSelected} className="hidden" />
+    </div>
+  );
+}
