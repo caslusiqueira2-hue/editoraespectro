@@ -94,23 +94,9 @@ const ArtigoPage = () => {
       {/* Content + Meta */}
       <main className="max-w-4xl mx-auto px-4 md:px-8 mt-10 mb-20">
         <div className="flex flex-col md:flex-row gap-12">
-          <article className="flex-1 space-y-5">
-            {conteudo.map((p, i) => {
-              if (typeof p === "string" && p.startsWith("[IMG]") && p.endsWith("[/IMG]")) {
-                const url = p.replace("[IMG]", "").replace("[/IMG]", "");
-                return <img key={i} src={url} alt="" className="w-full rounded-lg my-4" />;
-              }
-              if (typeof p === "string" && p.startsWith("**") && p.endsWith("**")) {
-                return <p key={i} className="text-base leading-relaxed"><strong className="text-accent">{p.replace(/\*\*/g, "")}</strong></p>;
-              }
-              return (
-                <p key={i} className="text-base leading-[1.8] text-foreground/85">
-                  {i === 0 && <span className="drop-cap">{String(p).charAt(0)}</span>}
-                  {i === 0 ? String(p).slice(1) : p}
-                </p>
-              );
-            })}
-          </article>
+          <article className="flex-1 prose-editor text-foreground/85"
+            dangerouslySetInnerHTML={{ __html: contentHtml }}
+          />
 
           <aside className="md:w-52 shrink-0 space-y-6 md:border-l md:border-border md:pl-8">
             <div>
