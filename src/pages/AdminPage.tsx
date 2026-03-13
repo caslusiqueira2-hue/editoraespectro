@@ -83,6 +83,28 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
         </div>
       </header>
 
+      {/* Settings bar */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
+        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4">
+          <FileText size={16} className="text-muted-foreground" />
+          <span className="text-sm text-foreground font-medium">Página "Envio de Originais"</span>
+          <button
+            onClick={() => {
+              const newVal = !envioVisible;
+              updateSetting.mutate({ key: "envio_page_visible", value: newVal });
+              toast.success(newVal ? "Página de envio visível" : "Página de envio oculta");
+            }}
+            className={`ml-auto text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-all ${
+              envioVisible !== false
+                ? "bg-accent/15 text-accent border border-accent/30"
+                : "bg-secondary text-muted-foreground border border-border"
+            }`}
+          >
+            {envioVisible !== false ? "Visível" : "Oculta"}
+          </button>
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         {isLoading ? (
           <p className="text-muted-foreground">Carregando posts…</p>
