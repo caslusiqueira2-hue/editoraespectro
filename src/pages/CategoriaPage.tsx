@@ -18,10 +18,10 @@ const CategoriaPage = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <div className="bg-secondary py-16 border-b border-border">
+      <div className="bg-secondary py-10 sm:py-16 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <span className="text-[10px] font-bold uppercase tracking-[4px] text-accent block mb-3">categoria</span>
-          <h1 className="text-4xl md:text-6xl font-black text-foreground font-[family-name:var(--font-display)] uppercase">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground font-[family-name:var(--font-display)] uppercase">
             {categoria?.nome || "Categoria"}
           </h1>
           <p className="text-muted-foreground text-sm mt-3 uppercase tracking-wider">
@@ -36,11 +36,11 @@ const CategoriaPage = () => {
         <span className="text-foreground">{categoria?.nome}</span>
       </div>
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-8 py-12">
+      <main className="flex-1 max-w-7xl mx-auto px-4 md:px-8 py-8 sm:py-12">
         {isLoading ? (
           <p className="text-center text-muted-foreground py-20">Carregando…</p>
         ) : artigos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {artigos.map((a, i) => (
               <motion.div key={a.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
                 <ArticleCard artigo={{
