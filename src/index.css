@@ -45,8 +45,8 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
-    --font-body: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;
+    --font-display: 'EB Garamond', Georgia, serif;
+    --font-body: 'EB Garamond', system-ui, sans-serif;
   }
 
   .dark {
