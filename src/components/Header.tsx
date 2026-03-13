@@ -119,10 +119,12 @@ const Header = () => {
                 {cat.nome}
               </Link>
             ))}
-            <Link to="/envio" onClick={() => setMenuOpen(false)}
-              className="block mt-4 bg-accent text-accent-foreground text-sm font-bold px-4 py-3 rounded-full text-center uppercase tracking-wider">
-              Enviar texto
-            </Link>
+            {envioVisible !== false && (
+              <Link to="/envio" onClick={() => setMenuOpen(false)}
+                className="block mt-4 bg-accent text-accent-foreground text-sm font-bold px-4 py-3 rounded-full text-center uppercase tracking-wider">
+                Enviar texto
+              </Link>
+            )}
           </div>
         )}
       </header>
