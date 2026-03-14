@@ -5,11 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSiteSetting, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
 import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText, BookOpen } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText, BookOpen, Inbox } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
 import AdminAnalytics from "@/components/AdminAnalytics";
 import AdminNewsletter from "@/components/AdminNewsletter";
 import AdminMagazine from "@/components/AdminMagazine";
+import AdminSubmissions from "@/components/AdminSubmissions";
 import { usePostViewCount } from "@/hooks/useAnalytics";
 
 const ADMIN_EMAIL = "christianlucas12@gmail.com";
@@ -69,7 +70,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const { data: posts, isLoading } = usePosts();
   const [editing, setEditing] = useState<Post | null>(null);
   const [creating, setCreating] = useState(false);
-  const [activeTab, setActiveTab] = useState<"posts" | "revista">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "revista" | "submissoes">("posts");
   const deletePost = useDeletePost();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
   const updateSetting = useUpdateSiteSetting();
@@ -143,11 +144,21 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
           >
             <BookOpen size={14} className="inline mr-1.5" /> Revista
           </button>
+          <button
+            onClick={() => setActiveTab("submissoes")}
+            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+              activeTab === "submissoes" ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Inbox size={14} className="inline mr-1.5" /> Submissões
+          </button>
         </div>
       </div>
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-4 pb-8">
-        {activeTab === "revista" ? (
+        {activeTab === "submissoes" ? (
+          <AdminSubmissions />
+        ) : activeTab === "revista" ? (
           <AdminMagazine />
         ) : (
           <>
