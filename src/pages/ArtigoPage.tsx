@@ -5,12 +5,15 @@ import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import { usePost } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { sanitizeHtml } from "@/lib/sanitize";
 import MaisLidos from "@/components/MaisLidos";
 
 const ArtigoPage = () => {
   const { slug } = useParams();
   const { data: artigo, isLoading } = usePost(slug || "");
   useTrackPageView(`/artigo/${slug}`, "post", artigo?.id);
+  useDocumentTitle(artigo?.titulo);
 
   if (isLoading) {
     return (
@@ -43,7 +46,7 @@ const ArtigoPage = () => {
       ? (artigo.conteudo as string[]).map(block => {
           if (typeof block === "string" && block.startsWith("[IMG]")) {
             const url = block.replace("[IMG]", "").replace("[/IMG]", "");
-            return `<img src="${url}" />`;
+            return `<img src="${encodeURI(url)}" loading="lazy" />`;
           }
           if (typeof block === "string" && block.startsWith("**") && block.endsWith("**")) {
             return `<p><strong>${block.replace(/\*\*/g, "")}</strong></p>`;
@@ -58,7 +61,7 @@ const ArtigoPage = () => {
 
       {artigo.imagem_url && (
         <div className="relative h-[35vh] sm:h-[50vh] min-h-[250px] sm:min-h-[350px] overflow-hidden">
-          <img src={artigo.imagem_url} alt={artigo.titulo} className="absolute inset-0 w-full h-full object-cover" />
+          <img src={artigo.imagem_url} alt={artigo.titulo} className="absolute inset-0 w-full h-full object-cover" loading="eager" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         </div>
       )}
@@ -83,17 +86,17 @@ const ArtigoPage = () => {
       </motion.div>
 
       {/* Breadcrumb */}
-      <div className="max-w-4xl mx-auto px-4 md:px-8 mt-4 sm:mt-6 text-xs text-muted-foreground uppercase tracking-wider overflow-x-auto whitespace-nowrap">
+      <nav className="max-w-4xl mx-auto px-4 md:px-8 mt-4 sm:mt-6 text-xs text-muted-foreground uppercase tracking-wider overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">
         <Link to="/" className="hover:text-accent transition-colors">Início</Link>
         <span className="mx-2">›</span>
         <Link to={`/categoria/${artigo.categories?.slug}`} className="hover:text-accent transition-colors">{artigo.categories?.nome}</Link>
         <span className="mx-2">›</span>
         <span className="text-foreground">{artigo.titulo}</span>
-      </div>
+      </nav>
 
       <main className="max-w-4xl mx-auto px-4 md:px-8 mt-8 sm:mt-10 mb-16 sm:mb-20">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12">
-          {/* On mobile, show meta first */}
+          {/* Mobile meta */}
           <aside className="md:hidden flex flex-wrap gap-6 pb-6 border-b border-border">
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Escrito por</span>
@@ -115,9 +118,8 @@ const ArtigoPage = () => {
             <MaisLidos />
           </div>
 
-          
           <article className="flex-1 prose-editor text-foreground/85 overflow-hidden"
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentHtml) }}
           />
 
           {/* Desktop sidebar */}
@@ -137,7 +139,6 @@ const ArtigoPage = () => {
               <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
             </div>
 
-            {/* Separator */}
             <div className="border-t border-border pt-6">
               <MaisLidos />
             </div>

@@ -3,8 +3,11 @@ import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
-import { useMagazineArticle, useVolumeArticles, useVolume } from "@/hooks/useMagazine";
+import AnimatedSection from "@/components/AnimatedSection";
+import { useMagazineArticle, useVolumeArticles } from "@/hooks/useMagazine";
 import { useTrackPageView } from "@/hooks/usePageTracking";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 const SECTION_LABELS: Record<string, string> = {
   conto: "Conto",
@@ -33,6 +36,7 @@ const RevistaArtigoPage = () => {
   const volume = article?.magazine_volumes;
   const { data: siblingArticles } = useVolumeArticles(volume?.id, true);
   useTrackPageView(`/revista/${volumeSlug}/${artigoSlug}`, "revista-artigo", article?.id);
+  useDocumentTitle(article ? `${article.titulo} — Revista Espectro` : undefined);
 
   if (isLoading) {
     return (
@@ -59,7 +63,6 @@ const RevistaArtigoPage = () => {
     );
   }
 
-  // Find prev/next articles
   const currentIdx = siblingArticles?.findIndex((a) => a.id === article.id) ?? -1;
   const prevArticle = currentIdx > 0 ? siblingArticles?.[currentIdx - 1] : null;
   const nextArticle = currentIdx >= 0 && siblingArticles ? siblingArticles[currentIdx + 1] : null;
@@ -70,7 +73,7 @@ const RevistaArtigoPage = () => {
 
       {article.imagem_url && (
         <div className="relative h-[35vh] sm:h-[50vh] min-h-[250px] overflow-hidden">
-          <img src={article.imagem_url} alt={article.titulo} className="absolute inset-0 w-full h-full object-cover" />
+          <img src={article.imagem_url} alt={article.titulo} className="absolute inset-0 w-full h-full object-cover" loading="eager" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         </div>
       )}
@@ -90,7 +93,7 @@ const RevistaArtigoPage = () => {
       </motion.div>
 
       {/* Breadcrumb */}
-      <div className="max-w-4xl mx-auto px-4 md:px-8 mt-4 sm:mt-6 text-xs text-muted-foreground uppercase tracking-wider overflow-x-auto whitespace-nowrap">
+      <nav className="max-w-4xl mx-auto px-4 md:px-8 mt-4 sm:mt-6 text-xs text-muted-foreground uppercase tracking-wider overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">
         <Link to="/" className="hover:text-accent transition-colors">Início</Link>
         <span className="mx-2">›</span>
         <Link to="/revista" className="hover:text-accent transition-colors">Revista</Link>
@@ -100,7 +103,7 @@ const RevistaArtigoPage = () => {
         </Link>
         <span className="mx-2">›</span>
         <span className="text-foreground">{article.titulo}</span>
-      </div>
+      </nav>
 
       {/* Back to Sumário */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 mt-3">
@@ -135,7 +138,7 @@ const RevistaArtigoPage = () => {
           {/* Article content */}
           <article
             className="flex-1 prose-editor text-foreground/85 overflow-hidden"
-            dangerouslySetInnerHTML={{ __html: article.conteudo }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.conteudo) }}
           />
 
           {/* Desktop sidebar */}
@@ -155,7 +158,6 @@ const RevistaArtigoPage = () => {
               </Link>
             </div>
 
-            {/* Other articles in this volume */}
             {siblingArticles && siblingArticles.length > 1 && (
               <div className="border-t border-border pt-6">
                 <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block mb-3">
@@ -179,24 +181,26 @@ const RevistaArtigoPage = () => {
 
         {/* Prev/Next navigation */}
         {(prevArticle || nextArticle) && (
-          <div className="mt-14 pt-8 border-t border-border flex justify-between gap-4">
-            {prevArticle ? (
-              <Link to={`/revista/${volumeSlug}/${prevArticle.slug}`} className="group text-left">
-                <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground">← Anterior</span>
-                <span className="block mt-1 text-sm font-[family-name:var(--font-display)] font-semibold text-foreground group-hover:text-accent transition-colors">
-                  {prevArticle.titulo}
-                </span>
-              </Link>
-            ) : <div />}
-            {nextArticle ? (
-              <Link to={`/revista/${volumeSlug}/${nextArticle.slug}`} className="group text-right">
-                <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground">Próximo →</span>
-                <span className="block mt-1 text-sm font-[family-name:var(--font-display)] font-semibold text-foreground group-hover:text-accent transition-colors">
-                  {nextArticle.titulo}
-                </span>
-              </Link>
-            ) : <div />}
-          </div>
+          <AnimatedSection>
+            <div className="mt-14 pt-8 border-t border-border flex justify-between gap-4">
+              {prevArticle ? (
+                <Link to={`/revista/${volumeSlug}/${prevArticle.slug}`} className="group text-left">
+                  <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground">← Anterior</span>
+                  <span className="block mt-1 text-sm font-[family-name:var(--font-display)] font-semibold text-foreground group-hover:text-accent transition-colors">
+                    {prevArticle.titulo}
+                  </span>
+                </Link>
+              ) : <div />}
+              {nextArticle ? (
+                <Link to={`/revista/${volumeSlug}/${nextArticle.slug}`} className="group text-right">
+                  <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground">Próximo →</span>
+                  <span className="block mt-1 text-sm font-[family-name:var(--font-display)] font-semibold text-foreground group-hover:text-accent transition-colors">
+                    {nextArticle.titulo}
+                  </span>
+                </Link>
+              ) : <div />}
+            </div>
+          </AnimatedSection>
         )}
       </main>
 

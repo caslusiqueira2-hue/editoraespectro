@@ -6,13 +6,16 @@ import QuoteBar from "@/components/QuoteBar";
 import ArticleCard from "@/components/ArticleCard";
 import MaisLidos from "@/components/MaisLidos";
 import NewsletterBox from "@/components/NewsletterBox";
+import AnimatedSection from "@/components/AnimatedSection";
 import { usePosts } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import capaBV from "@/assets/capa-boas-vindas.jpg";
 
 const Index = () => {
   const { data: posts, isLoading } = usePosts(true);
   useTrackPageView("/", "home");
+  useDocumentTitle();
   const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
 
   return (
@@ -24,9 +27,8 @@ const Index = () => {
         <section className="relative min-h-[60vh] sm:min-h-[75vh] md:min-h-[85vh] overflow-hidden flex items-end sm:items-center">
           <img
             src={heroArticle.imagem_url || capaBV}
-            alt=""
+            alt={heroArticle.titulo}
             className="absolute inset-0 w-full h-full object-cover scale-105"
-            aria-hidden="true"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
@@ -67,31 +69,21 @@ const Index = () => {
       <main className="flex-1">
         <section className="max-w-7xl mx-auto px-4 md:px-8 py-12 sm:py-20">
           <div className="flex items-end justify-between mb-8 sm:mb-12">
-            <motion.h2
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold leading-tight"
-            >
-              Publicações<br />recentes
-            </motion.h2>
+            <AnimatedSection>
+              <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+                Publicações<br />recentes
+              </h2>
+            </AnimatedSection>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-14">
-            {/* Articles grid */}
             <div className="flex-1">
               {isLoading ? (
                 <p className="text-center text-muted-foreground py-20">Carregando…</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {posts?.map((artigo, i) => (
-                    <motion.div
-                      key={artigo.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1, duration: 0.5 }}
-                    >
+                    <AnimatedSection key={artigo.id} delay={i * 0.08}>
                       <ArticleCard artigo={{
                         slug: artigo.slug,
                         titulo: artigo.titulo,
@@ -100,7 +92,7 @@ const Index = () => {
                         imagem: artigo.imagem_url || capaBV,
                         autor: artigo.autor,
                       }} />
-                    </motion.div>
+                    </AnimatedSection>
                   ))}
                 </div>
               )}
@@ -112,7 +104,6 @@ const Index = () => {
               )}
             </div>
 
-            {/* Sidebar — Mais Lidos */}
             <aside className="lg:w-64 shrink-0 lg:border-l lg:border-border lg:pl-10">
               <div className="lg:sticky lg:top-24">
                 <MaisLidos />
@@ -121,10 +112,11 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Newsletter */}
-        <section className="max-w-3xl mx-auto px-4 md:px-8 pb-12 sm:pb-20">
-          <NewsletterBox />
-        </section>
+        <AnimatedSection>
+          <section className="max-w-3xl mx-auto px-4 md:px-8 pb-12 sm:pb-20">
+            <NewsletterBox />
+          </section>
+        </AnimatedSection>
 
         <QuoteBar />
       </main>

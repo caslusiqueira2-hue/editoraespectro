@@ -3,8 +3,10 @@ import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArticleCard from "@/components/ArticleCard";
+import AnimatedSection from "@/components/AnimatedSection";
 import { usePosts, useCategories } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import capaBV from "@/assets/capa-boas-vindas.jpg";
 
 const CategoriaPage = () => {
@@ -14,6 +16,7 @@ const CategoriaPage = () => {
 
   const categoria = categories?.find((c) => c.slug === slug);
   useTrackPageView(`/categoria/${slug}`, "category", categoria?.id);
+  useDocumentTitle(categoria?.nome);
   const artigos = allPosts?.filter((a) => a.categories?.slug === slug) || [];
 
   return (
@@ -32,11 +35,11 @@ const CategoriaPage = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-6 text-xs text-muted-foreground uppercase tracking-wider">
+      <nav className="max-w-7xl mx-auto px-4 md:px-8 mt-6 text-xs text-muted-foreground uppercase tracking-wider" aria-label="Breadcrumb">
         <Link to="/" className="hover:text-accent transition-colors">Início</Link>
         <span className="mx-2">›</span>
         <span className="text-foreground">{categoria?.nome}</span>
-      </div>
+      </nav>
 
       <main className="flex-1 max-w-7xl mx-auto px-4 md:px-8 py-8 sm:py-12">
         {isLoading ? (
@@ -44,7 +47,7 @@ const CategoriaPage = () => {
         ) : artigos.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {artigos.map((a, i) => (
-              <motion.div key={a.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+              <AnimatedSection key={a.id} delay={i * 0.06}>
                 <ArticleCard artigo={{
                   slug: a.slug,
                   titulo: a.titulo,
@@ -53,7 +56,7 @@ const CategoriaPage = () => {
                   imagem: a.imagem_url || capaBV,
                   autor: a.autor,
                 }} />
-              </motion.div>
+              </AnimatedSection>
             ))}
           </div>
         ) : (
