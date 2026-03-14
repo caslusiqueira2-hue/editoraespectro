@@ -41,8 +41,9 @@
 
     --radius: 0.5rem;
 
-    --font-display: 'Outfit', system-ui, sans-serif;
-    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --font-display: 'Playfair Display', 'EB Garamond', 'Libre Baskerville', serif;
+    --font-body: 'Crimson Pro', 'Merriweather', 'Libre Baskerville', serif;
+    --font-ui: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
 
     --sidebar-background: 0 0% 6%;
     --sidebar-foreground: 0 0% 90%;
