@@ -117,6 +117,13 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
         <AdminAnalytics />
       </div>
 
+      {/* Newsletter */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
+          <AdminNewsletter />
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         <h2 className="font-[family-name:var(--font-display)] text-lg sm:text-xl font-black uppercase mb-4">Posts</h2>
         {isLoading ? (

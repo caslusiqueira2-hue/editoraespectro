@@ -121,6 +121,11 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Newsletter */}
+        <section className="max-w-3xl mx-auto px-4 md:px-8 pb-12 sm:pb-20">
+          <NewsletterBox />
+        </section>
+
         <QuoteBar />
       </main>
 
