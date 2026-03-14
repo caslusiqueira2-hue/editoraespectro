@@ -41,7 +41,7 @@ const Index = () => {
               <span className="inline-block text-[10px] font-bold uppercase tracking-[4px] text-accent mb-3 sm:mb-4">
                 {heroArticle.categories?.nome}
               </span>
-              <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.95] max-w-3xl uppercase">
+              <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-foreground leading-[0.95] max-w-3xl italic">
                 {heroArticle.titulo}
               </h1>
               <p className="mt-4 sm:mt-6 text-muted-foreground text-sm sm:text-base max-w-lg leading-relaxed">
