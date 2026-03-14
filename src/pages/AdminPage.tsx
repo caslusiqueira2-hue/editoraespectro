@@ -6,6 +6,8 @@ import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
+import AdminAnalytics from "@/components/AdminAnalytics";
+import { usePostViewCount } from "@/hooks/useAnalytics";
 
 const ADMIN_EMAIL = "christianlucas12@gmail.com";
 
@@ -109,44 +111,24 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
         </div>
       </div>
 
+      {/* Analytics */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
+        <AdminAnalytics />
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+        <h2 className="font-[family-name:var(--font-display)] text-lg sm:text-xl font-black uppercase mb-4">Posts</h2>
         {isLoading ? (
           <p className="text-muted-foreground">Carregando posts…</p>
         ) : (
           <div className="space-y-3">
             {posts?.map((post) => (
-              <div key={post.id} className="bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    {post.destaque && <Star size={14} className="text-accent" />}
-                    {post.published ? (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-accent flex items-center gap-1"><Eye size={12} /> Publicado</span>
-                    ) : (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1"><EyeOff size={12} /> Rascunho</span>
-                    )}
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">· {post.categories?.nome}</span>
-                  </div>
-                  <h3 className="font-[family-name:var(--font-display)] text-base sm:text-lg font-bold truncate">{post.titulo}</h3>
-                  <p className="text-sm text-muted-foreground truncate">{post.resumo}</p>
-                </div>
-                <div className="flex gap-2 shrink-0 self-end sm:self-center">
-                  <button onClick={() => setEditing(post)} className="p-2 hover:bg-secondary rounded-lg transition-colors" aria-label="Editar">
-                    <Pencil size={16} />
-                  </button>
-                  <button
-                    onClick={async () => {
-                      if (confirm("Deletar este post?")) {
-                        await deletePost.mutateAsync(post.id);
-                        toast.success("Post deletado");
-                      }
-                    }}
-                    className="p-2 hover:bg-destructive/20 text-destructive rounded-lg transition-colors"
-                    aria-label="Deletar"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
+              <PostRow key={post.id} post={post} onEdit={() => setEditing(post)} onDelete={async () => {
+                if (confirm("Deletar este post?")) {
+                  await deletePost.mutateAsync(post.id);
+                  toast.success("Post deletado");
+                }
+              }} />
             ))}
             {posts?.length === 0 && <p className="text-muted-foreground text-center py-12">Nenhum post ainda. Clique em "Novo post" para começar.</p>}
           </div>
@@ -159,6 +141,41 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
           onClose={() => { setEditing(null); setCreating(false); }}
         />
       )}
+    </div>
+  );
+}
+
+function PostRow({ post, onEdit, onDelete }: { post: Post; onEdit: () => void; onDelete: () => void }) {
+  const { data: viewCount } = usePostViewCount(post.id);
+
+  return (
+    <div className="bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          {post.destaque && <Star size={14} className="text-accent" />}
+          {post.published ? (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-accent flex items-center gap-1"><Eye size={12} /> Publicado</span>
+          ) : (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1"><EyeOff size={12} /> Rascunho</span>
+          )}
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">· {post.categories?.nome}</span>
+        </div>
+        <h3 className="font-[family-name:var(--font-display)] text-base sm:text-lg font-bold truncate">{post.titulo}</h3>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground truncate">{post.resumo}</p>
+          <span className="text-[11px] font-bold text-accent shrink-0 flex items-center gap-1">
+            <Eye size={12} /> {viewCount !== undefined ? viewCount.toLocaleString("pt-BR") : "…"}
+          </span>
+        </div>
+      </div>
+      <div className="flex gap-2 shrink-0 self-end sm:self-center">
+        <button onClick={onEdit} className="p-2 hover:bg-secondary rounded-lg transition-colors" aria-label="Editar">
+          <Pencil size={16} />
+        </button>
+        <button onClick={onDelete} className="p-2 hover:bg-destructive/20 text-destructive rounded-lg transition-colors" aria-label="Deletar">
+          <Trash2 size={16} />
+        </button>
+      </div>
     </div>
   );
 }

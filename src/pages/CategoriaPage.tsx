@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArticleCard from "@/components/ArticleCard";
 import { usePosts, useCategories } from "@/hooks/usePosts";
+import { useTrackPageView } from "@/hooks/usePageTracking";
 import capaBV from "@/assets/capa-boas-vindas.jpg";
 
 const CategoriaPage = () => {
@@ -12,6 +13,7 @@ const CategoriaPage = () => {
   const { data: allPosts, isLoading } = usePosts(true);
 
   const categoria = categories?.find((c) => c.slug === slug);
+  useTrackPageView(`/categoria/${slug}`, "category", categoria?.id);
   const artigos = allPosts?.filter((a) => a.categories?.slug === slug) || [];
 
   return (

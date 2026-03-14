@@ -5,10 +5,12 @@ import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import ArticleCard from "@/components/ArticleCard";
 import { usePosts } from "@/hooks/usePosts";
+import { useTrackPageView } from "@/hooks/usePageTracking";
 import capaBV from "@/assets/capa-boas-vindas.jpg";
 
 const Index = () => {
   const { data: posts, isLoading } = usePosts(true);
+  useTrackPageView("/", "home");
   const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
 
   return (
