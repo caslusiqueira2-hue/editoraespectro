@@ -71,9 +71,9 @@ const Index = () => {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="text-3xl sm:text-4xl md:text-5xl font-black uppercase leading-tight"
+              className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold leading-tight"
             >
-              Últimas<br />publicações
+              Publicações<br />recentes
             </motion.h2>
           </div>
 
