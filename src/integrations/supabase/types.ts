@@ -35,6 +35,98 @@ export type Database = {
         }
         Relationships: []
       }
+      magazine_articles: {
+        Row: {
+          autor: string
+          conteudo: string
+          created_at: string
+          id: string
+          imagem_url: string | null
+          ordem: number
+          published: boolean
+          secao: string
+          slug: string
+          titulo: string
+          updated_at: string
+          volume_id: string
+        }
+        Insert: {
+          autor: string
+          conteudo?: string
+          created_at?: string
+          id?: string
+          imagem_url?: string | null
+          ordem?: number
+          published?: boolean
+          secao?: string
+          slug: string
+          titulo: string
+          updated_at?: string
+          volume_id: string
+        }
+        Update: {
+          autor?: string
+          conteudo?: string
+          created_at?: string
+          id?: string
+          imagem_url?: string | null
+          ordem?: number
+          published?: boolean
+          secao?: string
+          slug?: string
+          titulo?: string
+          updated_at?: string
+          volume_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "magazine_articles_volume_id_fkey"
+            columns: ["volume_id"]
+            isOneToOne: false
+            referencedRelation: "magazine_volumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      magazine_volumes: {
+        Row: {
+          ano: number
+          capa_url: string | null
+          created_at: string
+          editorial: string | null
+          id: string
+          numero: number
+          published: boolean
+          slug: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          ano: number
+          capa_url?: string | null
+          created_at?: string
+          editorial?: string | null
+          id?: string
+          numero: number
+          published?: boolean
+          slug: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          ano?: number
+          capa_url?: string | null
+          created_at?: string
+          editorial?: string | null
+          id?: string
+          numero?: number
+          published?: boolean
+          slug?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           email: string
