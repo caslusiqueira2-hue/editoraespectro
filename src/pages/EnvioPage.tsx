@@ -51,6 +51,7 @@ const EnvioPage = () => {
   const [textoFile, setTextoFile] = useState<File | null>(null);
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [honeypot, setHoneypot] = useState("");
+  const [aceite, setAceite] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
