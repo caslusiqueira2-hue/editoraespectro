@@ -35,6 +35,33 @@ export type Database = {
         }
         Relationships: []
       }
+      page_views: {
+        Row: {
+          content_id: string | null
+          created_at: string
+          id: string
+          page_path: string
+          page_type: string
+          visitor_id: string
+        }
+        Insert: {
+          content_id?: string | null
+          created_at?: string
+          id?: string
+          page_path: string
+          page_type?: string
+          visitor_id: string
+        }
+        Update: {
+          content_id?: string | null
+          created_at?: string
+          id?: string
+          page_path?: string
+          page_type?: string
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           autor: string
