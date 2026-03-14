@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import ArticleCard from "@/components/ArticleCard";
 import MaisLidos from "@/components/MaisLidos";
+import NewsletterBox from "@/components/NewsletterBox";
 import { usePosts } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import capaBV from "@/assets/capa-boas-vindas.jpg";
