@@ -3,15 +3,10 @@ import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
+import AnimatedSection from "@/components/AnimatedSection";
 import { useVolumes } from "@/hooks/useMagazine";
 import { useTrackPageView } from "@/hooks/usePageTracking";
-
-const SECTION_LABELS: Record<string, string> = {
-  conto: "Contos",
-  poesia: "Poesia",
-  ensaio: "Ensaios",
-  resenha: "Resenhas",
-};
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const toRoman = (n: number) => {
   const numerals = [
@@ -30,6 +25,7 @@ const toRoman = (n: number) => {
 const RevistaPage = () => {
   const { data: volumes, isLoading } = useVolumes(true);
   useTrackPageView("/revista", "revista");
+  useDocumentTitle("Revista Espectro");
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -57,7 +53,6 @@ const RevistaPage = () => {
         </div>
       </section>
 
-
       {/* Volumes grid */}
       <main className="flex-1 max-w-7xl mx-auto px-4 md:px-8 py-12 sm:py-16">
         <h2 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold mb-10 text-center">
@@ -73,13 +68,7 @@ const RevistaPage = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {volumes?.map((vol, i) => (
-              <motion.div
-                key={vol.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-              >
+              <AnimatedSection key={vol.id} delay={i * 0.08}>
                 <Link
                   to={`/revista/${vol.slug}`}
                   className="group block bg-card border border-border rounded-xl overflow-hidden hover:border-accent/30 transition-all duration-300"
@@ -90,6 +79,7 @@ const RevistaPage = () => {
                         src={vol.capa_url}
                         alt={vol.titulo}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
                       />
                     </div>
                   ) : (
@@ -111,7 +101,7 @@ const RevistaPage = () => {
                     </p>
                   </div>
                 </Link>
-              </motion.div>
+              </AnimatedSection>
             ))}
           </div>
         )}

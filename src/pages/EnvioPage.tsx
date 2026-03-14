@@ -3,10 +3,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useSiteSetting } from "@/hooks/useSiteSettings";
 import { useTrackPageView } from "@/hooks/usePageTracking";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const EnvioPage = () => {
   const { data: envioVisible, isLoading } = useSiteSetting("envio_page_visible");
   useTrackPageView("/envio", "page");
+  useDocumentTitle("Envio de Originais");
 
   if (isLoading) return <div className="min-h-screen bg-background" />;
   if (envioVisible === false) return <Navigate to="/" replace />;
@@ -23,7 +25,7 @@ const EnvioPage = () => {
         </h1>
         <div className="space-y-5 text-base leading-[1.8] text-foreground/85">
           <p>
-            A Editora Espectro aceita submissões de textos originais e inéditos em língua portuguesa. 
+            A Editora Espectro aceita submissões de textos originais e inéditos em língua portuguesa.
             Publicamos ensaios, artigos, poesia, contos, crônicas e resenhas.
           </p>
           <p>
