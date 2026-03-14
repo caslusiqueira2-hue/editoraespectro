@@ -255,12 +255,29 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
         titulo, subtitulo: subtitulo || null, slug, autor, categoria_id: categoriaId,
         resumo, conteudo: conteudoHtml as any, imagem_url: imagemUrl || null, published, destaque,
       };
+
+      const wasPublished = post?.published;
+
       if (isEditing) {
-        await updatePost.mutateAsync({ id: post!.id, ...payload });
+        const result = await updatePost.mutateAsync({ id: post!.id, ...payload });
         toast.success("Post atualizado");
+
+        // Send newsletter if just published
+        if (published && !wasPublished) {
+          supabase.functions.invoke("send-newsletter", { body: { post_id: post!.id } })
+            .then(() => toast.success("Newsletter enviada aos inscritos!"))
+            .catch(() => {});
+        }
       } else {
-        await createPost.mutateAsync(payload);
+        const result = await createPost.mutateAsync(payload);
         toast.success("Post criado");
+
+        // Send newsletter if published on creation
+        if (published && result?.id) {
+          supabase.functions.invoke("send-newsletter", { body: { post_id: result.id } })
+            .then(() => toast.success("Newsletter enviada aos inscritos!"))
+            .catch(() => {});
+        }
       }
       onClose();
     } catch (err: any) {
