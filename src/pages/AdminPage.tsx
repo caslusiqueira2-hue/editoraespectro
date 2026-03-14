@@ -83,9 +83,6 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
             <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 border border-border text-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-secondary transition-colors">
               <Eye size={16} /> <span className="hidden xs:inline">Ver site</span>
             </a>
-            <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity">
-              <Plus size={16} /> Novo post
-            </button>
             <button onClick={onSignOut} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Sair">
               <LogOut size={20} />
             </button>
