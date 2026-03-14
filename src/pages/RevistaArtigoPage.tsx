@@ -102,6 +102,16 @@ const RevistaArtigoPage = () => {
         <span className="text-foreground">{article.titulo}</span>
       </div>
 
+      {/* Back to Sumário */}
+      <div className="max-w-4xl mx-auto px-4 md:px-8 mt-3">
+        <Link
+          to={`/revista/${volumeSlug}`}
+          className="inline-flex items-center gap-1 text-xs text-accent hover:underline font-[family-name:var(--font-ui)] uppercase tracking-wider"
+        >
+          ← Voltar para Sumário
+        </Link>
+      </div>
+
       <main className="max-w-4xl mx-auto px-4 md:px-8 mt-8 sm:mt-10 mb-16 sm:mb-20">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12">
           {/* Mobile meta */}

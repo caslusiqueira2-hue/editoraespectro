@@ -101,6 +101,16 @@ const VolumePage = () => {
         <span className="text-foreground">{volume.titulo}</span>
       </div>
 
+      {/* Back link */}
+      <div className="max-w-4xl mx-auto px-4 md:px-8 mt-3">
+        <Link
+          to="/revista"
+          className="inline-flex items-center gap-1 text-xs text-accent hover:underline font-[family-name:var(--font-ui)] uppercase tracking-wider"
+        >
+          ← Voltar para Revista
+        </Link>
+      </div>
+
       <main className="max-w-4xl mx-auto px-4 md:px-8 mt-10 mb-16 sm:mb-20">
         {/* Editorial */}
         {volume.editorial && (
