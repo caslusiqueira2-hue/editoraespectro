@@ -349,7 +349,7 @@ const EnvioPage = () => {
 
             {/* Arquivo do texto */}
             <div className="space-y-2">
-              <Label>Arquivo do texto * <span className="text-muted-foreground font-normal">(.doc, .docx)</span></Label>
+              <Label>Arquivo do texto * <span className="text-muted-foreground font-normal">(.doc, .docx, .pdf)</span></Label>
               <input
                 ref={textoInputRef}
                 type="file"
