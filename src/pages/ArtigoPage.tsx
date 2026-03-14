@@ -110,7 +110,12 @@ const ArtigoPage = () => {
               <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
             </div>
           </aside>
+          {/* Mobile "Mais Lidos" */}
+          <div className="md:hidden border-t border-border pt-6">
+            <MaisLidos />
+          </div>
 
+          
           <article className="flex-1 prose-editor text-foreground/85 overflow-hidden"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />

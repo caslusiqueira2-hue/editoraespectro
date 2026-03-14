@@ -76,36 +76,48 @@ const Index = () => {
             </motion.h2>
           </div>
 
-          {isLoading ? (
-            <p className="text-center text-muted-foreground py-20">Carregando…</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {posts?.map((artigo, i) => (
-                <motion.div
-                  key={artigo.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                >
-                  <ArticleCard artigo={{
-                    slug: artigo.slug,
-                    titulo: artigo.titulo,
-                    resumo: artigo.resumo,
-                    categoria: artigo.categories?.nome || "",
-                    imagem: artigo.imagem_url || capaBV,
-                    autor: artigo.autor,
-                  }} />
-                </motion.div>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-14">
+            {/* Articles grid */}
+            <div className="flex-1">
+              {isLoading ? (
+                <p className="text-center text-muted-foreground py-20">Carregando…</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {posts?.map((artigo, i) => (
+                    <motion.div
+                      key={artigo.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1, duration: 0.5 }}
+                    >
+                      <ArticleCard artigo={{
+                        slug: artigo.slug,
+                        titulo: artigo.titulo,
+                        resumo: artigo.resumo,
+                        categoria: artigo.categories?.nome || "",
+                        imagem: artigo.imagem_url || capaBV,
+                        autor: artigo.autor,
+                      }} />
+                    </motion.div>
+                  ))}
+                </div>
+              )}
 
-          {!isLoading && posts?.length === 0 && (
-            <p className="text-center text-muted-foreground py-20">
-              Nenhum artigo publicado ainda.
-            </p>
-          )}
+              {!isLoading && posts?.length === 0 && (
+                <p className="text-center text-muted-foreground py-20">
+                  Nenhum artigo publicado ainda.
+                </p>
+              )}
+            </div>
+
+            {/* Sidebar — Mais Lidos */}
+            <aside className="lg:w-64 shrink-0 lg:border-l lg:border-border lg:pl-10">
+              <div className="lg:sticky lg:top-24">
+                <MaisLidos />
+              </div>
+            </aside>
+          </div>
         </section>
 
         <QuoteBar />
