@@ -93,6 +93,9 @@ const Header = () => {
 
             {/* Desktop actions */}
             <div className="hidden md:flex items-center gap-3 z-10">
+              <button onClick={toggleTheme} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Alternar tema">
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
               <button onClick={() => setSearchOpen(true)} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Buscar">
                 <Search size={18} />
               </button>
@@ -105,6 +108,9 @@ const Header = () => {
 
             {/* Mobile actions */}
             <div className="flex md:hidden items-center gap-1 z-10">
+              <button onClick={toggleTheme} className="p-2 text-foreground" aria-label="Alternar tema">
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
               <button onClick={() => setSearchOpen(true)} className="p-2 text-foreground" aria-label="Buscar">
                 <Search size={20} />
               </button>
