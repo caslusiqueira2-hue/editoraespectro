@@ -6,6 +6,8 @@ import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
+import AdminAnalytics from "@/components/AdminAnalytics";
+import { usePostViewCount } from "@/hooks/useAnalytics";
 
 const ADMIN_EMAIL = "christianlucas12@gmail.com";
 
