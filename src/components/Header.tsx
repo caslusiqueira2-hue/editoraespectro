@@ -14,6 +14,7 @@ const Header = () => {
   const { data: posts } = usePosts(true);
   const { data: categories } = useCategories();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
+  const { theme, toggleTheme } = useTheme();
 
   const navCategories = categories?.filter(c => c.slug !== "") || [];
 
