@@ -69,7 +69,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo */}
             <Link to="/" className="flex-shrink-0 z-10">
-              <img src={logoEspectro} alt="Espectro" className="h-10 sm:h-12 w-auto" />
+              <img src={logoEspectro} alt="Espectro" className={`h-10 sm:h-12 w-auto transition-all duration-300 ${theme === "light" ? "invert" : ""}`} />
             </Link>
 
             {/* Desktop nav */}
