@@ -4,10 +4,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import { usePost } from "@/hooks/usePosts";
+import { useTrackPageView } from "@/hooks/usePageTracking";
 
 const ArtigoPage = () => {
   const { slug } = useParams();
   const { data: artigo, isLoading } = usePost(slug || "");
+  useTrackPageView(`/artigo/${slug}`, "post", artigo?.id);
 
   if (isLoading) {
     return (

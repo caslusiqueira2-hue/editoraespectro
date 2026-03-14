@@ -2,9 +2,11 @@ import { Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useSiteSetting } from "@/hooks/useSiteSettings";
+import { useTrackPageView } from "@/hooks/usePageTracking";
 
 const EnvioPage = () => {
   const { data: envioVisible, isLoading } = useSiteSetting("envio_page_visible");
+  useTrackPageView("/envio", "page");
 
   if (isLoading) return <div className="min-h-screen bg-background" />;
   if (envioVisible === false) return <Navigate to="/" replace />;
