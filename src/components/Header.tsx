@@ -81,6 +81,12 @@ const Header = () => {
                   {cat.nome}
                 </Link>
               ))}
+              <Link
+                to="/revista"
+                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-[2px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap font-[family-name:var(--font-ui)]"
+              >
+                Revista
+              </Link>
             </nav>
 
             {/* Desktop actions */}
