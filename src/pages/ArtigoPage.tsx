@@ -72,7 +72,7 @@ const ArtigoPage = () => {
         <span className="inline-block text-[10px] font-bold uppercase tracking-[4px] text-accent mb-3">
           {artigo.categories?.nome}
         </span>
-        <h1 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-5xl font-black leading-tight text-foreground uppercase">
+        <h1 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-5xl font-bold leading-tight text-foreground">
           {artigo.titulo}
         </h1>
         {artigo.subtitulo && (

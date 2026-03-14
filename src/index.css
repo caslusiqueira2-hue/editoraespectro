@@ -41,8 +41,9 @@
 
     --radius: 0.5rem;
 
-    --font-display: 'Outfit', system-ui, sans-serif;
-    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --font-display: 'Playfair Display', 'EB Garamond', 'Libre Baskerville', serif;
+    --font-body: 'Crimson Pro', 'Merriweather', 'Libre Baskerville', serif;
+    --font-ui: 'Space Grotesk', 'Outfit', system-ui, sans-serif;
 
     --sidebar-background: 0 0% 6%;
     --sidebar-foreground: 0 0% 90%;
@@ -61,10 +62,13 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-body);
+    font-family: var(--font-ui);
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+  }
+  article, .prose-editor, blockquote {
+    font-family: var(--font-body);
   }
 }
 
@@ -99,8 +103,9 @@ p.has-dropcap::first-letter,
 /* TipTap / Rich Editor */
 .prose-editor {
   font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.8;
+  font-size: 1.1rem;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
 }
 .prose-editor p {
   margin-bottom: 0.75em;

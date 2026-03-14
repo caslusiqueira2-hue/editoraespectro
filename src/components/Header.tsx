@@ -76,7 +76,7 @@ const Header = () => {
                 <Link
                   key={cat.slug}
                   to={`/categoria/${cat.slug}`}
-                  className="px-3 py-1.5 text-xs font-semibold uppercase tracking-[2px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+                  className="px-3 py-1.5 text-xs font-semibold uppercase tracking-[2px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap font-[family-name:var(--font-ui)]"
                 >
                   {cat.nome}
                 </Link>

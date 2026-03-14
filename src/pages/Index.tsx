@@ -38,10 +38,10 @@ const Index = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="max-w-7xl mx-auto px-4 md:px-8"
             >
-              <span className="inline-block text-[10px] font-bold uppercase tracking-[4px] text-accent mb-3 sm:mb-4">
+              <span className="inline-block text-[10px] font-semibold uppercase tracking-[4px] text-accent mb-3 sm:mb-4 font-[family-name:var(--font-ui)]">
                 {heroArticle.categories?.nome}
               </span>
-              <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-foreground leading-[0.95] max-w-3xl uppercase">
+              <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-foreground leading-[0.95] max-w-3xl italic">
                 {heroArticle.titulo}
               </h1>
               <p className="mt-4 sm:mt-6 text-muted-foreground text-sm sm:text-base max-w-lg leading-relaxed">
@@ -50,11 +50,11 @@ const Index = () => {
               <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-4">
                 <Link
                   to={`/artigo/${heroArticle.slug}`}
-                  className="bg-accent text-accent-foreground px-6 sm:px-8 py-3 text-sm font-bold uppercase tracking-wider rounded-full hover:opacity-90 transition-opacity"
+                  className="bg-accent text-accent-foreground px-6 sm:px-8 py-3 text-sm font-bold uppercase tracking-wider rounded-full hover:opacity-90 transition-opacity font-[family-name:var(--font-ui)]"
                 >
                   Explorar
                 </Link>
-                <span className="text-xs text-muted-foreground uppercase tracking-widest">
+                <span className="text-xs text-muted-foreground tracking-widest font-[family-name:var(--font-ui)]">
                   por {heroArticle.autor}
                 </span>
               </div>
@@ -71,9 +71,9 @@ const Index = () => {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="text-3xl sm:text-4xl md:text-5xl font-black uppercase leading-tight"
+              className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold leading-tight"
             >
-              Últimas<br />publicações
+              Publicações<br />recentes
             </motion.h2>
           </div>
 
