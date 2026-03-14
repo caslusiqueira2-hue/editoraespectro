@@ -38,7 +38,7 @@ const Index = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="max-w-7xl mx-auto px-4 md:px-8"
             >
-              <span className="inline-block text-[10px] font-bold uppercase tracking-[4px] text-accent mb-3 sm:mb-4">
+              <span className="inline-block text-[10px] font-semibold uppercase tracking-[4px] text-accent mb-3 sm:mb-4 font-[family-name:var(--font-ui)]">
                 {heroArticle.categories?.nome}
               </span>
               <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-foreground leading-[0.95] max-w-3xl italic">
