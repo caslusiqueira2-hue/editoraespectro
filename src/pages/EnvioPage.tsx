@@ -391,6 +391,7 @@ const EnvioPage = () => {
                 </span>
               </button>
               {errors.foto && <p className="text-sm text-destructive">{errors.foto}</p>}
+              <p className="text-xs text-muted-foreground italic">Se possível, envie a foto no seguinte formato: 1080×1350 px</p>
             </div>
 
             {/* Aceite dos termos */}
