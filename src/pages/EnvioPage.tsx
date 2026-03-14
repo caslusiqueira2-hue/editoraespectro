@@ -390,6 +390,22 @@ const EnvioPage = () => {
               {errors.foto && <p className="text-sm text-destructive">{errors.foto}</p>}
             </div>
 
+            {/* Aceite dos termos */}
+            <div className="space-y-2">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="aceite"
+                  checked={aceite}
+                  onCheckedChange={(v) => setAceite(v === true)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor="aceite" className="text-sm leading-relaxed text-muted-foreground cursor-pointer">
+                  Li e concordo com as diretrizes de envio e os termos de autorização do autor.
+                </Label>
+              </div>
+              {errors.aceite && <p className="text-sm text-destructive">{errors.aceite}</p>}
+            </div>
+
             <Button
               type="submit"
               disabled={submitting || cooldown}
