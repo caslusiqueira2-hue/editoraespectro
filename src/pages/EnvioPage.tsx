@@ -26,6 +26,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_DOC_TYPES = [
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/pdf",
 ];
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 const GENEROS = ["Conto", "Crônica", "Poema", "Ensaio", "Resenha"] as const;
@@ -66,7 +67,7 @@ const EnvioPage = () => {
       errs.texto = "Arquivo do texto é obrigatório";
     } else {
       if (!ACCEPTED_DOC_TYPES.includes(textoFile.type)) {
-        errs.texto = "Apenas arquivos .doc ou .docx são aceitos";
+        errs.texto = "Apenas arquivos .doc, .docx ou .pdf são aceitos";
       }
       if (textoFile.size > MAX_FILE_SIZE) {
         errs.texto = "O arquivo deve ter no máximo 10 MB";
@@ -348,11 +349,11 @@ const EnvioPage = () => {
 
             {/* Arquivo do texto */}
             <div className="space-y-2">
-              <Label>Arquivo do texto * <span className="text-muted-foreground font-normal">(.doc, .docx)</span></Label>
+              <Label>Arquivo do texto * <span className="text-muted-foreground font-normal">(.doc, .docx, .pdf)</span></Label>
               <input
                 ref={textoInputRef}
                 type="file"
-                accept=".doc,.docx"
+                accept=".doc,.docx,.pdf"
                 className="hidden"
                 onChange={(e) => setTextoFile(e.target.files?.[0] || null)}
               />
@@ -363,7 +364,7 @@ const EnvioPage = () => {
               >
                 <FileText className="w-5 h-5 text-accent shrink-0" />
                 <span className="truncate text-muted-foreground">
-                  {textoFile ? textoFile.name : "Selecionar arquivo .doc ou .docx"}
+                  {textoFile ? textoFile.name : "Selecionar arquivo .doc, .docx ou .pdf"}
                 </span>
               </button>
               {errors.texto && <p className="text-sm text-destructive">{errors.texto}</p>}
