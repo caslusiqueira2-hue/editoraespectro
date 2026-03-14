@@ -47,7 +47,7 @@ const Footer = () => {
               Contato
             </Link>
             <a
-              href="https://www.instagram.com/oversosub/"
+              href="https://www.instagram.com/espectroeditoraa/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-accent transition-colors"
