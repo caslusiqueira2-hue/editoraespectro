@@ -69,6 +69,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const { data: posts, isLoading } = usePosts();
   const [editing, setEditing] = useState<Post | null>(null);
   const [creating, setCreating] = useState(false);
+  const [activeTab, setActiveTab] = useState<"posts" | "revista">("posts");
   const deletePost = useDeletePost();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
   const updateSetting = useUpdateSiteSetting();
