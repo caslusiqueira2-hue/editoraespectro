@@ -43,9 +43,9 @@ const Footer = () => {
             <Link to="/envio" className="hover:text-accent transition-colors">
               Envio
             </Link>
-            <Link to="/" className="hover:text-accent transition-colors">
+            <a href="mailto:espekeditora@gmail.com" className="hover:text-accent transition-colors">
               Contato
-            </Link>
+            </a>
             <a
               href="https://www.instagram.com/espectroeditoraa/"
               target="_blank"
