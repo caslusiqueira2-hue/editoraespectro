@@ -28,27 +28,29 @@ const PageLoader = () => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/artigo/:slug" element={<ArtigoPage />} />
-            <Route path="/categoria/:slug" element={<CategoriaPage />} />
-            <Route path="/envio" element={<EnvioPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/revista" element={<RevistaPage />} />
-            <Route path="/revista/secao/:secao" element={<RevistaSecaoPage />} />
-            <Route path="/revista/:volumeSlug" element={<VolumePage />} />
-            <Route path="/revista/:volumeSlug/:artigoSlug" element={<RevistaArtigoPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/artigo/:slug" element={<ArtigoPage />} />
+              <Route path="/categoria/:slug" element={<CategoriaPage />} />
+              <Route path="/envio" element={<EnvioPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/revista" element={<RevistaPage />} />
+              <Route path="/revista/secao/:secao" element={<RevistaSecaoPage />} />
+              <Route path="/revista/:volumeSlug" element={<VolumePage />} />
+              <Route path="/revista/:volumeSlug/:artigoSlug" element={<RevistaArtigoPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

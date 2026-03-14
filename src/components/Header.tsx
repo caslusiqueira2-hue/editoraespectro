@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, X, Menu } from "lucide-react";
+import { Search, X, Menu, Sun, Moon } from "lucide-react";
 import { usePosts, useCategories } from "@/hooks/usePosts";
 import { useSiteSetting } from "@/hooks/useSiteSettings";
+import { useTheme } from "@/hooks/useTheme";
 import logoEspectro from "@/assets/logo-espectro.png";
 
 const Header = () => {
