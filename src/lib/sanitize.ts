@@ -9,7 +9,8 @@ export function sanitizeHtml(html: string): string {
     ],
     ALLOWED_ATTR: [
       "href", "src", "alt", "title", "class", "target", "rel",
-      "width", "height", "loading",
+      "width", "height", "loading", "style",
     ],
-  });
+    ALLOWED_CSS_PROPERTIES: ["text-align", "font-family"],
+  } as any);
 }
