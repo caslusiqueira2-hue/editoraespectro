@@ -62,10 +62,13 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-body);
+    font-family: var(--font-ui);
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+  }
+  article, .prose-editor, blockquote {
+    font-family: var(--font-body);
   }
 }
 
