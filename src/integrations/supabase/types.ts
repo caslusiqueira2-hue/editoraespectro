@@ -255,6 +255,42 @@ export type Database = {
         }
         Relationships: []
       }
+      submissions: {
+        Row: {
+          created_at: string
+          email: string
+          foto_url: string | null
+          genero: string
+          id: string
+          mensagem: string | null
+          nome: string
+          texto_url: string
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          foto_url?: string | null
+          genero: string
+          id?: string
+          mensagem?: string | null
+          nome: string
+          texto_url: string
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          foto_url?: string | null
+          genero?: string
+          id?: string
+          mensagem?: string | null
+          nome?: string
+          texto_url?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
