@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { Upload, FileText, Image, CheckCircle2, Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_DOC_TYPES = [
@@ -50,6 +51,7 @@ const EnvioPage = () => {
   const [textoFile, setTextoFile] = useState<File | null>(null);
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [honeypot, setHoneypot] = useState("");
+  const [aceite, setAceite] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -92,6 +94,10 @@ const EnvioPage = () => {
 
     const result = formSchema.safeParse({ nome, email, genero, titulo, mensagem });
     const fileErrors = validateFiles();
+
+    if (!aceite) {
+      fileErrors.aceite = "Você deve concordar com as diretrizes e termos para enviar.";
+    }
 
     if (!result.success || Object.keys(fileErrors).length > 0) {
       const fieldErrors: Record<string, string> = {};
@@ -201,6 +207,46 @@ const EnvioPage = () => {
               </li>
             ))}
           </ul>
+
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-bold mt-10 uppercase text-foreground">
+            Formatação do texto
+          </h2>
+          <ul className="list-none space-y-3 text-muted-foreground">
+            {[
+              "Fonte: Times New Roman",
+              "Espaçamento entre linhas: 2,5",
+              "Alinhamento do texto: justificado",
+              "Título: centralizado",
+              "Nome do autor: alinhado à esquerda",
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="text-accent mt-1">●</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-bold mt-10 uppercase text-foreground">
+            Autorização do autor
+          </h2>
+          <p className="text-muted-foreground">
+            Ao submeter um texto, o autor declara que:
+          </p>
+          <ul className="list-none space-y-3 text-muted-foreground">
+            {[
+              "É titular dos direitos autorais da obra enviada",
+              "Autoriza a equipe editorial a realizar correções gramaticais pontuais, caso necessário",
+              "Autoriza a publicação de sua imagem de perfil no site e nas redes sociais da editora para fins de divulgação",
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="text-accent mt-1">●</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="text-muted-foreground italic">
+            Os direitos autorais da obra permanecem integralmente com o autor, que tem liberdade para publicar o texto em outros veículos, se assim desejar.
+          </p>
         </div>
 
         {success ? (
@@ -342,6 +388,22 @@ const EnvioPage = () => {
                 </span>
               </button>
               {errors.foto && <p className="text-sm text-destructive">{errors.foto}</p>}
+            </div>
+
+            {/* Aceite dos termos */}
+            <div className="space-y-2">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="aceite"
+                  checked={aceite}
+                  onCheckedChange={(v) => setAceite(v === true)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor="aceite" className="text-sm leading-relaxed text-muted-foreground cursor-pointer">
+                  Li e concordo com as diretrizes de envio e os termos de autorização do autor.
+                </Label>
+              </div>
+              {errors.aceite && <p className="text-sm text-destructive">{errors.aceite}</p>}
             </div>
 
             <Button
