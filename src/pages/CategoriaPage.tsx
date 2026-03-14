@@ -23,7 +23,7 @@ const CategoriaPage = () => {
       <div className="bg-secondary py-10 sm:py-16 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <span className="text-[10px] font-bold uppercase tracking-[4px] text-accent block mb-3">categoria</span>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-foreground font-[family-name:var(--font-display)] uppercase">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-foreground font-[family-name:var(--font-display)]">
             {categoria?.nome || "Categoria"}
           </h1>
           <p className="text-muted-foreground text-sm mt-3 uppercase tracking-wider">

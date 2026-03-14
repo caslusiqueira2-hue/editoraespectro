@@ -50,11 +50,11 @@ const Index = () => {
               <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-4">
                 <Link
                   to={`/artigo/${heroArticle.slug}`}
-                  className="bg-accent text-accent-foreground px-6 sm:px-8 py-3 text-sm font-bold uppercase tracking-wider rounded-full hover:opacity-90 transition-opacity"
+                  className="bg-accent text-accent-foreground px-6 sm:px-8 py-3 text-sm font-bold uppercase tracking-wider rounded-full hover:opacity-90 transition-opacity font-[family-name:var(--font-ui)]"
                 >
                   Explorar
                 </Link>
-                <span className="text-xs text-muted-foreground uppercase tracking-widest">
+                <span className="text-xs text-muted-foreground tracking-widest font-[family-name:var(--font-ui)]">
                   por {heroArticle.autor}
                 </span>
               </div>

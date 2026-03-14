@@ -103,8 +103,9 @@ p.has-dropcap::first-letter,
 /* TipTap / Rich Editor */
 .prose-editor {
   font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.8;
+  font-size: 1.1rem;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
 }
 .prose-editor p {
   margin-bottom: 0.75em;

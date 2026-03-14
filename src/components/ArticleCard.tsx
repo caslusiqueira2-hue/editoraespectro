@@ -26,7 +26,7 @@ const ArticleCard = ({ artigo }: ArticleCardProps) => (
           <span className="inline-block text-[9px] font-bold uppercase tracking-[2px] text-accent mb-2">
             {artigo.categoria}
           </span>
-          <h3 className="font-[family-name:var(--font-display)] text-sm font-bold leading-snug text-foreground uppercase">
+          <h3 className="font-[family-name:var(--font-display)] text-sm font-semibold leading-snug text-foreground">
             {artigo.titulo}
           </h3>
           <div className="mt-2 text-[10px] text-muted-foreground uppercase tracking-wider">

@@ -29,10 +29,13 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 sm:py-16">
         <div className="flex flex-col md:flex-row justify-between gap-8 sm:gap-10">
           <div>
-            <div className="text-2xl sm:text-3xl font-black font-[family-name:var(--font-display)] tracking-tight text-foreground uppercase">
+            <div className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] tracking-tight text-foreground">
               Espectro
             </div>
-            <p className="mt-3 text-muted-foreground text-sm max-w-xs leading-relaxed">
+            <p className="mt-2 text-muted-foreground text-xs italic font-[family-name:var(--font-body)] tracking-wide">
+              Literatura, pensamento e ecos do invisível.
+            </p>
+            <p className="mt-3 text-muted-foreground text-sm max-w-xs leading-relaxed font-[family-name:var(--font-body)]">
               Uma editora de literatura, pensamento e cultura. Publicamos ensaios, poesia, ficção e resenhas.
             </p>
           </div>
