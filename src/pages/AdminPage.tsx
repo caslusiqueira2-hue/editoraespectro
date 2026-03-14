@@ -144,6 +144,14 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
           >
             <BookOpen size={14} className="inline mr-1.5" /> Revista
           </button>
+          <button
+            onClick={() => setActiveTab("submissoes")}
+            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+              activeTab === "submissoes" ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Inbox size={14} className="inline mr-1.5" /> Submissões
+          </button>
         </div>
       </div>
 
