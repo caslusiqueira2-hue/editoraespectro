@@ -1,12 +1,14 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePosts, useCategories, useCreatePost, useUpdatePost, useDeletePost, uploadPostImage } from "@/hooks/usePosts";
+import { supabase } from "@/integrations/supabase/client";
 import { useSiteSetting, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
 import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
 import AdminAnalytics from "@/components/AdminAnalytics";
+import AdminNewsletter from "@/components/AdminNewsletter";
 import { usePostViewCount } from "@/hooks/useAnalytics";
 
 const ADMIN_EMAIL = "christianlucas12@gmail.com";
@@ -114,6 +116,13 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
       {/* Analytics */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
         <AdminAnalytics />
+      </div>
+
+      {/* Newsletter */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
+          <AdminNewsletter />
+        </div>
       </div>
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
@@ -246,12 +255,29 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
         titulo, subtitulo: subtitulo || null, slug, autor, categoria_id: categoriaId,
         resumo, conteudo: conteudoHtml as any, imagem_url: imagemUrl || null, published, destaque,
       };
+
+      const wasPublished = post?.published;
+
       if (isEditing) {
-        await updatePost.mutateAsync({ id: post!.id, ...payload });
+        const result = await updatePost.mutateAsync({ id: post!.id, ...payload });
         toast.success("Post atualizado");
+
+        // Send newsletter if just published
+        if (published && !wasPublished) {
+          supabase.functions.invoke("send-newsletter", { body: { post_id: post!.id } })
+            .then(() => toast.success("Newsletter enviada aos inscritos!"))
+            .catch(() => {});
+        }
       } else {
-        await createPost.mutateAsync(payload);
+        const result = await createPost.mutateAsync(payload);
         toast.success("Post criado");
+
+        // Send newsletter if published on creation
+        if (published && result?.id) {
+          supabase.functions.invoke("send-newsletter", { body: { post_id: result.id } })
+            .then(() => toast.success("Newsletter enviada aos inscritos!"))
+            .catch(() => {});
+        }
       }
       onClose();
     } catch (err: any) {

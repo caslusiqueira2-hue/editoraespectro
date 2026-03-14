@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import ArticleCard from "@/components/ArticleCard";
 import MaisLidos from "@/components/MaisLidos";
+import NewsletterBox from "@/components/NewsletterBox";
 import { usePosts } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import capaBV from "@/assets/capa-boas-vindas.jpg";
@@ -118,6 +119,11 @@ const Index = () => {
               </div>
             </aside>
           </div>
+        </section>
+
+        {/* Newsletter */}
+        <section className="max-w-3xl mx-auto px-4 md:px-8 pb-12 sm:pb-20">
+          <NewsletterBox />
         </section>
 
         <QuoteBar />
