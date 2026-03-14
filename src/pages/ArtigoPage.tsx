@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import { usePost } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
+import MaisLidos from "@/components/MaisLidos";
 
 const ArtigoPage = () => {
   const { slug } = useParams();
