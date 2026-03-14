@@ -364,7 +364,7 @@ const EnvioPage = () => {
               >
                 <FileText className="w-5 h-5 text-accent shrink-0" />
                 <span className="truncate text-muted-foreground">
-                  {textoFile ? textoFile.name : "Selecionar arquivo .doc ou .docx"}
+                  {textoFile ? textoFile.name : "Selecionar arquivo .doc, .docx ou .pdf"}
                 </span>
               </button>
               {errors.texto && <p className="text-sm text-destructive">{errors.texto}</p>}
