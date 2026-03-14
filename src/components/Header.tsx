@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, X, Menu } from "lucide-react";
+import { Search, X, Menu, Sun, Moon } from "lucide-react";
 import { usePosts, useCategories } from "@/hooks/usePosts";
 import { useSiteSetting } from "@/hooks/useSiteSettings";
+import { useTheme } from "@/hooks/useTheme";
 import logoEspectro from "@/assets/logo-espectro.png";
 
 const Header = () => {
@@ -13,6 +14,7 @@ const Header = () => {
   const { data: posts } = usePosts(true);
   const { data: categories } = useCategories();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
+  const { theme, toggleTheme } = useTheme();
 
   const navCategories = categories?.filter(c => c.slug !== "") || [];
 
@@ -67,7 +69,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo */}
             <Link to="/" className="flex-shrink-0 z-10">
-              <img src={logoEspectro} alt="Espectro" className="h-10 sm:h-12 w-auto" />
+              <img src={logoEspectro} alt="Espectro" className={`h-10 sm:h-12 w-auto transition-all duration-300 ${theme === "light" ? "invert" : ""}`} />
             </Link>
 
             {/* Desktop nav */}
@@ -91,6 +93,9 @@ const Header = () => {
 
             {/* Desktop actions */}
             <div className="hidden md:flex items-center gap-3 z-10">
+              <button onClick={toggleTheme} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Alternar tema">
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
               <button onClick={() => setSearchOpen(true)} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Buscar">
                 <Search size={18} />
               </button>
@@ -103,6 +108,9 @@ const Header = () => {
 
             {/* Mobile actions */}
             <div className="flex md:hidden items-center gap-1 z-10">
+              <button onClick={toggleTheme} className="p-2 text-foreground" aria-label="Alternar tema">
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
               <button onClick={() => setSearchOpen(true)} className="p-2 text-foreground" aria-label="Buscar">
                 <Search size={20} />
               </button>
