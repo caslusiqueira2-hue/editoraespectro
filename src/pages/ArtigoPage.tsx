@@ -116,7 +116,7 @@ const ArtigoPage = () => {
           />
 
           {/* Desktop sidebar */}
-          <aside className="hidden md:block md:w-52 shrink-0 space-y-6 md:border-l md:border-border md:pl-8">
+          <aside className="hidden md:block md:w-56 shrink-0 space-y-8 md:border-l md:border-border md:pl-8">
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Escrito por</span>
               <span className="text-sm font-bold mt-1 block text-foreground">{artigo.autor}</span>
@@ -130,6 +130,11 @@ const ArtigoPage = () => {
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Editoria</span>
               <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
+            </div>
+
+            {/* Separator */}
+            <div className="border-t border-border pt-6">
+              <MaisLidos />
             </div>
           </aside>
         </div>
