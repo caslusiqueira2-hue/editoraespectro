@@ -145,6 +145,41 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   );
 }
 
+function PostRow({ post, onEdit, onDelete }: { post: Post; onEdit: () => void; onDelete: () => void }) {
+  const { data: viewCount } = usePostViewCount(post.id);
+
+  return (
+    <div className="bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          {post.destaque && <Star size={14} className="text-accent" />}
+          {post.published ? (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-accent flex items-center gap-1"><Eye size={12} /> Publicado</span>
+          ) : (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1"><EyeOff size={12} /> Rascunho</span>
+          )}
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">· {post.categories?.nome}</span>
+        </div>
+        <h3 className="font-[family-name:var(--font-display)] text-base sm:text-lg font-bold truncate">{post.titulo}</h3>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground truncate">{post.resumo}</p>
+          <span className="text-[11px] font-bold text-accent shrink-0 flex items-center gap-1">
+            <Eye size={12} /> {viewCount !== undefined ? viewCount.toLocaleString("pt-BR") : "…"}
+          </span>
+        </div>
+      </div>
+      <div className="flex gap-2 shrink-0 self-end sm:self-center">
+        <button onClick={onEdit} className="p-2 hover:bg-secondary rounded-lg transition-colors" aria-label="Editar">
+          <Pencil size={16} />
+        </button>
+        <button onClick={onDelete} className="p-2 hover:bg-destructive/20 text-destructive rounded-lg transition-colors" aria-label="Deletar">
+          <Trash2 size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void }) {
   const { data: categories } = useCategories();
   const createPost = useCreatePost();
