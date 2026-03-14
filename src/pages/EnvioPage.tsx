@@ -353,7 +353,7 @@ const EnvioPage = () => {
               <input
                 ref={textoInputRef}
                 type="file"
-                accept=".doc,.docx"
+                accept=".doc,.docx,.pdf"
                 className="hidden"
                 onChange={(e) => setTextoFile(e.target.files?.[0] || null)}
               />
