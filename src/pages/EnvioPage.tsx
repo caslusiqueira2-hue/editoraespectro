@@ -95,6 +95,10 @@ const EnvioPage = () => {
     const result = formSchema.safeParse({ nome, email, genero, titulo, mensagem });
     const fileErrors = validateFiles();
 
+    if (!aceite) {
+      fileErrors.aceite = "Você deve concordar com as diretrizes e termos para enviar.";
+    }
+
     if (!result.success || Object.keys(fileErrors).length > 0) {
       const fieldErrors: Record<string, string> = {};
       if (!result.success) {
