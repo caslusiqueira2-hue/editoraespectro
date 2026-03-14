@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSiteSetting, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
 import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText, BookOpen } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
 import AdminAnalytics from "@/components/AdminAnalytics";
 import AdminNewsletter from "@/components/AdminNewsletter";
+import AdminMagazine from "@/components/AdminMagazine";
 import { usePostViewCount } from "@/hooks/useAnalytics";
 
 const ADMIN_EMAIL = "christianlucas12@gmail.com";
@@ -68,6 +69,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const { data: posts, isLoading } = usePosts();
   const [editing, setEditing] = useState<Post | null>(null);
   const [creating, setCreating] = useState(false);
+  const [activeTab, setActiveTab] = useState<"posts" | "revista">("posts");
   const deletePost = useDeletePost();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
   const updateSetting = useUpdateSiteSetting();
@@ -81,9 +83,6 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
             <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 border border-border text-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-secondary transition-colors">
               <Eye size={16} /> <span className="hidden xs:inline">Ver site</span>
             </a>
-            <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity">
-              <Plus size={16} /> Novo post
-            </button>
             <button onClick={onSignOut} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Sair">
               <LogOut size={20} />
             </button>
@@ -125,22 +124,55 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-        <h2 className="font-[family-name:var(--font-display)] text-lg sm:text-xl font-black uppercase mb-4">Posts</h2>
-        {isLoading ? (
-          <p className="text-muted-foreground">Carregando posts…</p>
+      {/* Content tabs */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab("posts")}
+            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+              activeTab === "posts" ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <FileText size={14} className="inline mr-1.5" /> Posts
+          </button>
+          <button
+            onClick={() => setActiveTab("revista")}
+            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+              activeTab === "revista" ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BookOpen size={14} className="inline mr-1.5" /> Revista
+          </button>
+        </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-4 pb-8">
+        {activeTab === "revista" ? (
+          <AdminMagazine />
         ) : (
-          <div className="space-y-3">
-            {posts?.map((post) => (
-              <PostRow key={post.id} post={post} onEdit={() => setEditing(post)} onDelete={async () => {
-                if (confirm("Deletar este post?")) {
-                  await deletePost.mutateAsync(post.id);
-                  toast.success("Post deletado");
-                }
-              }} />
-            ))}
-            {posts?.length === 0 && <p className="text-muted-foreground text-center py-12">Nenhum post ainda. Clique em "Novo post" para começar.</p>}
-          </div>
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-[family-name:var(--font-display)] text-lg sm:text-xl font-black uppercase">Posts</h2>
+              <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity">
+                <Plus size={16} /> Novo post
+              </button>
+            </div>
+            {isLoading ? (
+              <p className="text-muted-foreground">Carregando posts…</p>
+            ) : (
+              <div className="space-y-3">
+                {posts?.map((post) => (
+                  <PostRow key={post.id} post={post} onEdit={() => setEditing(post)} onDelete={async () => {
+                    if (confirm("Deletar este post?")) {
+                      await deletePost.mutateAsync(post.id);
+                      toast.success("Post deletado");
+                    }
+                  }} />
+                ))}
+                {posts?.length === 0 && <p className="text-muted-foreground text-center py-12">Nenhum post ainda. Clique em "Novo post" para começar.</p>}
+              </div>
+            )}
+          </>
         )}
       </main>
 
