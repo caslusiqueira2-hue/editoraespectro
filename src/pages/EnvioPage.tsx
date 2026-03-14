@@ -207,6 +207,46 @@ const EnvioPage = () => {
               </li>
             ))}
           </ul>
+
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-bold mt-10 uppercase text-foreground">
+            Formatação do texto
+          </h2>
+          <ul className="list-none space-y-3 text-muted-foreground">
+            {[
+              "Fonte: Times New Roman",
+              "Espaçamento entre linhas: 2,5",
+              "Alinhamento do texto: justificado",
+              "Título: centralizado",
+              "Nome do autor: alinhado à esquerda",
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="text-accent mt-1">●</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          <h2 className="font-[family-name:var(--font-display)] text-xl font-bold mt-10 uppercase text-foreground">
+            Autorização do autor
+          </h2>
+          <p className="text-muted-foreground">
+            Ao submeter um texto, o autor declara que:
+          </p>
+          <ul className="list-none space-y-3 text-muted-foreground">
+            {[
+              "É titular dos direitos autorais da obra enviada",
+              "Autoriza a equipe editorial a realizar correções gramaticais pontuais, caso necessário",
+              "Autoriza a publicação de sua imagem de perfil no site e nas redes sociais da editora para fins de divulgação",
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="text-accent mt-1">●</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="text-muted-foreground italic">
+            Os direitos autorais da obra permanecem integralmente com o autor, que tem liberdade para publicar o texto em outros veículos, se assim desejar.
+          </p>
         </div>
 
         {success ? (
