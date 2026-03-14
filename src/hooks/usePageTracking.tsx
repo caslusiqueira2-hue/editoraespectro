@@ -19,18 +19,19 @@ export function useTrackPageView(
   useEffect(() => {
     if (!pagePath) return;
 
-    const visitorId = getVisitorId();
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) return; // Admin — don't track
 
-    supabase
-      .from("page_views")
-      .insert({
+      const visitorId = getVisitorId();
+
+      const { error } = await supabase.from("page_views").insert({
         page_path: pagePath,
         page_type: pageType,
         content_id: contentId || null,
         visitor_id: visitorId,
-      })
-      .then(({ error }) => {
-        if (error) console.error("Failed to track page view:", error.message);
       });
+      if (error) console.error("Failed to track page view:", error.message);
+    })();
   }, [pagePath, pageType, contentId]);
 }
