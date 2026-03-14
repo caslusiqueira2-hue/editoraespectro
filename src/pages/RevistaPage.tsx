@@ -57,20 +57,6 @@ const RevistaPage = () => {
         </div>
       </section>
 
-      {/* Section filter */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pb-4">
-        <div className="flex flex-wrap items-center gap-3 justify-center">
-          {Object.entries(SECTION_LABELS).map(([key, label]) => (
-            <Link
-              key={key}
-              to={`/revista/secao/${key}`}
-              className="text-[10px] font-bold uppercase tracking-[3px] text-muted-foreground hover:text-accent transition-colors font-[family-name:var(--font-ui)] border border-border rounded-full px-4 py-1.5 hover:border-accent/30"
-            >
-              {label}
-            </Link>
-          ))}
-        </div>
-      </div>
 
       {/* Volumes grid */}
       <main className="flex-1 max-w-7xl mx-auto px-4 md:px-8 py-12 sm:py-16">

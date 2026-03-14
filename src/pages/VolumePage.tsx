@@ -165,8 +165,23 @@ const VolumePage = () => {
           )}
         </div>
 
+        {/* Section filter (genres) */}
+        <div className="mt-14 mb-10">
+          <div className="flex flex-wrap items-center gap-3 justify-center">
+            {SECTION_ORDER.map((key) => (
+              <Link
+                key={key}
+                to={`/revista/secao/${key}`}
+                className="text-[10px] font-bold uppercase tracking-[3px] text-muted-foreground hover:text-accent transition-colors font-[family-name:var(--font-ui)] border border-border rounded-full px-4 py-1.5 hover:border-accent/30"
+              >
+                {SECTION_LABELS[key] || key}
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* Read full edition button */}
-        <div className="mt-14 text-center">
+        <div className="mt-4 text-center">
           <button
             className="border border-accent/30 text-accent px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wider hover:bg-accent hover:text-accent-foreground transition-all font-[family-name:var(--font-ui)]"
             onClick={() => {
