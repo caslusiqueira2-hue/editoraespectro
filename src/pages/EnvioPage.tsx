@@ -26,6 +26,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_DOC_TYPES = [
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/pdf",
 ];
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 const GENEROS = ["Conto", "Crônica", "Poema", "Ensaio", "Resenha"] as const;
