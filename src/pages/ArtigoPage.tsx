@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import { usePost } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
+import MaisLidos from "@/components/MaisLidos";
 
 const ArtigoPage = () => {
   const { slug } = useParams();
@@ -109,13 +110,18 @@ const ArtigoPage = () => {
               <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
             </div>
           </aside>
+          {/* Mobile "Mais Lidos" */}
+          <div className="md:hidden border-t border-border pt-6">
+            <MaisLidos />
+          </div>
 
+          
           <article className="flex-1 prose-editor text-foreground/85 overflow-hidden"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
 
           {/* Desktop sidebar */}
-          <aside className="hidden md:block md:w-52 shrink-0 space-y-6 md:border-l md:border-border md:pl-8">
+          <aside className="hidden md:block md:w-56 shrink-0 space-y-8 md:border-l md:border-border md:pl-8">
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Escrito por</span>
               <span className="text-sm font-bold mt-1 block text-foreground">{artigo.autor}</span>
@@ -129,6 +135,11 @@ const ArtigoPage = () => {
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Editoria</span>
               <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
+            </div>
+
+            {/* Separator */}
+            <div className="border-t border-border pt-6">
+              <MaisLidos />
             </div>
           </aside>
         </div>
