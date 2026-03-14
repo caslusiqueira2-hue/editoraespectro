@@ -217,7 +217,8 @@ const EnvioPage = () => {
           <ul className="list-none space-y-3 text-muted-foreground">
             {[
               "Fonte: Times New Roman",
-              "Espaçamento entre linhas: 2,5",
+              "Margens 2,5 (esquerda, direita, antes e depois)",
+              "Espaçamento: Simples",
               "Alinhamento do texto: justificado",
               "Título: centralizado",
               "Nome do autor: alinhado à esquerda",
