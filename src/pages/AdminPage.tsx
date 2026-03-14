@@ -156,7 +156,9 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-4 pb-8">
-        {activeTab === "revista" ? (
+        {activeTab === "submissoes" ? (
+          <AdminSubmissions />
+        ) : activeTab === "revista" ? (
           <AdminMagazine />
         ) : (
           <>
