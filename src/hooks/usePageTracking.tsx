@@ -13,7 +13,7 @@ function getVisitorId(): string {
 
 export function useTrackPageView(
   pagePath: string,
-  pageType: "home" | "post" | "category" | "page" = "page",
+  pageType: "home" | "post" | "category" | "page" | "revista" | "revista-volume" | "revista-artigo" = "page",
   contentId?: string
 ) {
   useEffect(() => {

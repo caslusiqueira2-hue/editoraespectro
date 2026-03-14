@@ -129,6 +129,9 @@ const Header = () => {
                 {cat.nome}
               </Link>
             ))}
+            <Link to="/revista" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors">
+              Revista
+            </Link>
             {envioVisible !== false && (
               <Link to="/envio" onClick={() => setMenuOpen(false)}
                 className="block mt-4 bg-accent text-accent-foreground text-sm font-bold px-4 py-3 rounded-full text-center uppercase tracking-wider">
