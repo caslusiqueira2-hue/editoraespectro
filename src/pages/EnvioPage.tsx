@@ -198,6 +198,7 @@ const EnvioPage = () => {
               "Textos originais e inéditos",
               "Em língua portuguesa",
               "Até 3 poemas de 1 página cada",
+              "Demais textos até 3 páginas",
               "Enviar em formato .doc ou .docx",
               "Incluir breve nota biográfica do autor",
               "Tamanho máximo do arquivo: 10 MB",
