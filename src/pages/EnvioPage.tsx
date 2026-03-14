@@ -67,7 +67,7 @@ const EnvioPage = () => {
       errs.texto = "Arquivo do texto é obrigatório";
     } else {
       if (!ACCEPTED_DOC_TYPES.includes(textoFile.type)) {
-        errs.texto = "Apenas arquivos .doc ou .docx são aceitos";
+        errs.texto = "Apenas arquivos .doc, .docx ou .pdf são aceitos";
       }
       if (textoFile.size > MAX_FILE_SIZE) {
         errs.texto = "O arquivo deve ter no máximo 10 MB";
