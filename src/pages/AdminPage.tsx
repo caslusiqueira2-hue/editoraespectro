@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSiteSetting, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
 import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText, BookOpen } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText, BookOpen, Inbox } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
 import AdminAnalytics from "@/components/AdminAnalytics";
 import AdminNewsletter from "@/components/AdminNewsletter";
