@@ -12,6 +12,7 @@ interface Submission {
   mensagem: string | null;
   texto_url: string;
   foto_url: string | null;
+  destino: string;
   created_at: string;
 }
 
