@@ -45,6 +45,7 @@ const EnvioPage = () => {
   useTrackPageView("/envio", "page");
   useDocumentTitle("Envio de Originais");
 
+  const [destino, setDestino] = useState<"site" | "revista">("site");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [genero, setGenero] = useState("");
