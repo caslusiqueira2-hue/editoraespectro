@@ -45,6 +45,8 @@ Deno.serve(async (req) => {
       ? `${supabaseUrl}/storage/v1/object/public/submissions/${submission.foto_url}`
       : null;
 
+    const destinoLabel = submission.destino === "revista" ? "Revista" : "Site";
+
     // Send email via Resend
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) {
@@ -60,6 +62,9 @@ Deno.serve(async (req) => {
     const htmlBody = `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px;">Nova Submissão Recebida</h2>
+        <div style="background: #f0f0f0; border-left: 4px solid #333; padding: 12px 16px; margin: 16px 0; font-size: 15px;">
+          <strong>Destino:</strong> ${destinoLabel}
+        </div>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr>
             <td style="padding: 8px 12px; font-weight: bold; color: #555; width: 120px;">Autor</td>
@@ -98,7 +103,7 @@ Deno.serve(async (req) => {
     const { error: emailError } = await resend.emails.send({
       from: "onboarding@resend.dev",
       to: "espekeditora@gmail.com",
-      subject: `Nova submissão: "${submission.titulo}" — ${submission.nome}`,
+      subject: `[${destinoLabel}] Nova submissão: "${submission.titulo}" — ${submission.nome}`,
       html: htmlBody,
     });
 
