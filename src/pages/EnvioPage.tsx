@@ -280,6 +280,37 @@ const EnvioPage = () => {
               />
             </div>
 
+            {/* Destino */}
+            <div className="space-y-2">
+              <Label>Contribuir para *</Label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDestino("site")}
+                  className={`flex-1 py-3 px-4 rounded-lg border text-sm font-bold uppercase tracking-wider transition-all ${
+                    destino === "site"
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-border text-muted-foreground hover:border-accent/50"
+                  }`}
+                >
+                  Site
+                </button>
+                {revistaVisible && (
+                  <button
+                    type="button"
+                    onClick={() => setDestino("revista")}
+                    className={`flex-1 py-3 px-4 rounded-lg border text-sm font-bold uppercase tracking-wider transition-all ${
+                      destino === "revista"
+                        ? "border-accent bg-accent/10 text-accent"
+                        : "border-border text-muted-foreground hover:border-accent/50"
+                    }`}
+                  >
+                    Revista
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* Nome */}
             <div className="space-y-2">
               <Label htmlFor="nome">Nome *</Label>
