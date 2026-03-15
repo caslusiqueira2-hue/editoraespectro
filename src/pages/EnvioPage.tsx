@@ -138,22 +138,27 @@ const EnvioPage = () => {
       }
 
       // Insert submission record
+      const insertPayload = {
+        nome: result.data.nome,
+        email: result.data.email,
+        genero: result.data.genero,
+        titulo: result.data.titulo,
+        mensagem: result.data.mensagem || null,
+        texto_url: textoPath,
+        foto_url: fotoPath,
+        destino,
+      };
+      console.log("Insert payload:", insertPayload);
       const { data: submission, error: insertError } = await supabase
         .from("submissions")
-        .insert({
-          nome: result.data.nome,
-          email: result.data.email,
-          genero: result.data.genero,
-          titulo: result.data.titulo,
-          mensagem: result.data.mensagem || null,
-          texto_url: textoPath,
-          foto_url: fotoPath,
-          destino,
-        } as any)
+        .insert(insertPayload as any)
         .select("id")
         .single();
 
-      if (insertError) throw new Error("Erro ao registrar submissão");
+      if (insertError) {
+        console.error("Insert error:", JSON.stringify(insertError));
+        throw new Error("Erro ao registrar submissão");
+      }
 
       // Invoke edge function (fire and forget)
       supabase.functions.invoke("handle-submission", {
