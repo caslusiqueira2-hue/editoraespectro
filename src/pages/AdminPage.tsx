@@ -73,6 +73,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const [activeTab, setActiveTab] = useState<"posts" | "revista" | "submissoes">("posts");
   const deletePost = useDeletePost();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
+  const { data: revistaVisible } = useSiteSetting("envio_revista_visible");
   const updateSetting = useUpdateSiteSetting();
 
   return (
