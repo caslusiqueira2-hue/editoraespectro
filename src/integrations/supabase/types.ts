@@ -258,6 +258,7 @@ export type Database = {
       submissions: {
         Row: {
           created_at: string
+          destino: string
           email: string
           foto_url: string | null
           genero: string
@@ -269,6 +270,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          destino?: string
           email: string
           foto_url?: string | null
           genero: string
@@ -280,6 +282,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          destino?: string
           email?: string
           foto_url?: string | null
           genero?: string
