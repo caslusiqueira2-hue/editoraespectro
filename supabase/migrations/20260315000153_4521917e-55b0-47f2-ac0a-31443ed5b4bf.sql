@@ -1,0 +1,1 @@
+ALTER TABLE public.submissions ADD COLUMN destino text NOT NULL DEFAULT 'site';

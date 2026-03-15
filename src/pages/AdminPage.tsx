@@ -73,6 +73,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const [activeTab, setActiveTab] = useState<"posts" | "revista" | "submissoes">("posts");
   const deletePost = useDeletePost();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
+  const { data: revistaVisible } = useSiteSetting("envio_revista_visible");
   const updateSetting = useUpdateSiteSetting();
 
   return (
@@ -93,23 +94,43 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
 
       {/* Settings bar */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
-        <div className="bg-card border border-border rounded-xl p-4 flex flex-wrap items-center gap-3 sm:gap-4">
-          <FileText size={16} className="text-muted-foreground shrink-0" />
-          <span className="text-sm text-foreground font-medium">Página "Envio de Originais"</span>
-          <button
-            onClick={() => {
-              const newVal = !envioVisible;
-              updateSetting.mutate({ key: "envio_page_visible", value: newVal });
-              toast.success(newVal ? "Página de envio visível" : "Página de envio oculta");
-            }}
-            className={`sm:ml-auto text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-all ${
-              envioVisible !== false
-                ? "bg-accent/15 text-accent border border-accent/30"
-                : "bg-secondary text-muted-foreground border border-border"
-            }`}
-          >
-            {envioVisible !== false ? "Visível" : "Oculta"}
-          </button>
+        <div className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3 sm:gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
+            <FileText size={16} className="text-muted-foreground shrink-0" />
+            <span className="text-sm text-foreground font-medium">Página "Envio de Originais"</span>
+            <button
+              onClick={() => {
+                const newVal = !envioVisible;
+                updateSetting.mutate({ key: "envio_page_visible", value: newVal });
+                toast.success(newVal ? "Página de envio visível" : "Página de envio oculta");
+              }}
+              className={`text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-all ${
+                envioVisible !== false
+                  ? "bg-accent/15 text-accent border border-accent/30"
+                  : "bg-secondary text-muted-foreground border border-border"
+              }`}
+            >
+              {envioVisible !== false ? "Visível" : "Oculta"}
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto sm:ml-auto">
+            <BookOpen size={16} className="text-muted-foreground shrink-0" />
+            <span className="text-sm text-foreground font-medium">Envio para Revista</span>
+            <button
+              onClick={() => {
+                const newVal = !revistaVisible;
+                updateSetting.mutate({ key: "envio_revista_visible", value: newVal });
+                toast.success(newVal ? "Envio para revista habilitado" : "Envio para revista desabilitado");
+              }}
+              className={`text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-all ${
+                revistaVisible === true
+                  ? "bg-accent/15 text-accent border border-accent/30"
+                  : "bg-secondary text-muted-foreground border border-border"
+              }`}
+            >
+              {revistaVisible === true ? "Habilitado" : "Desabilitado"}
+            </button>
+          </div>
         </div>
       </div>
 

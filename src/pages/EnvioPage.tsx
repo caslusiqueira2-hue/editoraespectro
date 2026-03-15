@@ -41,9 +41,11 @@ const formSchema = z.object({
 
 const EnvioPage = () => {
   const { data: envioVisible, isLoading } = useSiteSetting("envio_page_visible");
+  const { data: revistaVisible } = useSiteSetting("envio_revista_visible");
   useTrackPageView("/envio", "page");
   useDocumentTitle("Envio de Originais");
 
+  const [destino, setDestino] = useState<"site" | "revista">("site");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [genero, setGenero] = useState("");
@@ -146,7 +148,8 @@ const EnvioPage = () => {
           mensagem: result.data.mensagem || null,
           texto_url: textoPath,
           foto_url: fotoPath,
-        })
+          destino,
+        } as any)
         .select("id")
         .single();
 
@@ -275,6 +278,37 @@ const EnvioPage = () => {
                 value={honeypot}
                 onChange={(e) => setHoneypot(e.target.value)}
               />
+            </div>
+
+            {/* Destino */}
+            <div className="space-y-2">
+              <Label>Contribuir para *</Label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDestino("site")}
+                  className={`flex-1 py-3 px-4 rounded-lg border text-sm font-bold uppercase tracking-wider transition-all ${
+                    destino === "site"
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-border text-muted-foreground hover:border-accent/50"
+                  }`}
+                >
+                  Site
+                </button>
+                {revistaVisible && (
+                  <button
+                    type="button"
+                    onClick={() => setDestino("revista")}
+                    className={`flex-1 py-3 px-4 rounded-lg border text-sm font-bold uppercase tracking-wider transition-all ${
+                      destino === "revista"
+                        ? "border-accent bg-accent/10 text-accent"
+                        : "border-border text-muted-foreground hover:border-accent/50"
+                    }`}
+                  >
+                    Revista
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Nome */}

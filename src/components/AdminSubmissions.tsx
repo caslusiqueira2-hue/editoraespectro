@@ -12,6 +12,7 @@ interface Submission {
   mensagem: string | null;
   texto_url: string;
   foto_url: string | null;
+  destino: string;
   created_at: string;
 }
 
@@ -67,6 +68,11 @@ const AdminSubmissions = () => {
                 <span className="font-medium text-foreground">{s.nome}</span>
                 <span className="flex items-center gap-1"><Mail size={12} /> {s.email}</span>
                 <span className="text-accent text-xs font-bold uppercase">{s.genero}</span>
+                <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded-full ${
+                  s.destino === "revista" ? "bg-primary/15 text-primary" : "bg-accent/15 text-accent"
+                }`}>
+                  {s.destino === "revista" ? "Revista" : "Site"}
+                </span>
                 <span className="flex items-center gap-1 text-xs">
                   <Calendar size={12} />
                   {new Date(s.created_at).toLocaleDateString("pt-BR", {
