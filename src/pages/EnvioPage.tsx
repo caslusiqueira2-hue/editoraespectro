@@ -41,6 +41,7 @@ const formSchema = z.object({
 
 const EnvioPage = () => {
   const { data: envioVisible, isLoading } = useSiteSetting("envio_page_visible");
+  const { data: revistaVisible } = useSiteSetting("envio_revista_visible");
   useTrackPageView("/envio", "page");
   useDocumentTitle("Envio de Originais");
 
