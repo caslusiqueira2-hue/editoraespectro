@@ -148,7 +148,8 @@ const EnvioPage = () => {
           mensagem: result.data.mensagem || null,
           texto_url: textoPath,
           foto_url: fotoPath,
-        })
+          destino,
+        } as any)
         .select("id")
         .single();
 
