@@ -45,13 +45,25 @@ function sanitizeFileName(name: string): string {
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_DOC_TYPES = [
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "application/pdf",
-];
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
+const ACCEPTED_DOC_EXTENSIONS = ["doc", "docx", "pdf"];
+const ACCEPTED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
 const GENEROS = ["Conto", "Crônica", "Poema", "Ensaio", "Resenha"] as const;
+
+function getFileExtension(name: string): string {
+  return name.split(".").pop()?.toLowerCase() || "";
+}
+
+function getContentType(ext: string): string {
+  const map: Record<string, string> = {
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    pdf: "application/pdf",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+  };
+  return map[ext] || "application/octet-stream";
+}
 
 const formSchema = z.object({
   nome: z.string().trim().min(1, "Nome é obrigatório").max(200),
