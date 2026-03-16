@@ -85,6 +85,7 @@ const EnvioPage = () => {
   const [genero, setGenero] = useState("");
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [instagram, setInstagram] = useState("");
   const [textoFile, setTextoFile] = useState<File | null>(null);
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [honeypot, setHoneypot] = useState("");
