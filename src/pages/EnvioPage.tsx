@@ -147,12 +147,12 @@ const EnvioPage = () => {
         .from("submissions")
         .upload(textoPath, textoFile!);
 
-      if (textoError) throw new Error("Erro ao enviar arquivo do texto");
+      if (textoError) throw new Error(`Erro ao enviar arquivo do texto: ${textoError.message}`);
 
       // Upload photo if provided
       let fotoPath: string | null = null;
       if (fotoFile) {
-        fotoPath = `${safeNome}_${timestamp}/${fotoFile.name}`;
+        fotoPath = `${safeNome}_${timestamp}/${sanitizeFileName(fotoFile.name)}`;
         const { error: fotoError } = await supabase.storage
           .from("submissions")
           .upload(fotoPath, fotoFile);
