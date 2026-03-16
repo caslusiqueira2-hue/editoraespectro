@@ -189,6 +189,7 @@ const EnvioPage = () => {
           mensagem: result.data.mensagem || null,
           texto_url: textoPath,
           foto_url: fotoPath,
+          instagram: instagram.trim() || null,
           destino,
         });
 
