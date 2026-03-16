@@ -22,6 +22,28 @@ import { toast } from "@/hooks/use-toast";
 import { Upload, FileText, Image, CheckCircle2, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
+function generateUUID(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    const buf = new Uint8Array(16);
+    crypto.getRandomValues(buf);
+    buf[6] = (buf[6] & 0x0f) | 0x40;
+    buf[8] = (buf[8] & 0x3f) | 0x80;
+    const hex = Array.from(buf, (b) => b.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+}
+
+function sanitizeFileName(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9.]/g, "_")
+    .replace(/_+/g, "_")
+    .toLowerCase();
+}
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_DOC_TYPES = [
   "application/msword",
@@ -120,25 +142,25 @@ const EnvioPage = () => {
       const safeNome = nome.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
 
       // Upload text file
-      const textoPath = `${safeNome}_${timestamp}/${textoFile!.name}`;
+      const textoPath = `${safeNome}_${timestamp}/${sanitizeFileName(textoFile!.name)}`;
       const { error: textoError } = await supabase.storage
         .from("submissions")
         .upload(textoPath, textoFile!);
 
-      if (textoError) throw new Error("Erro ao enviar arquivo do texto");
+      if (textoError) throw new Error(`Erro ao enviar arquivo do texto: ${textoError.message}`);
 
       // Upload photo if provided
       let fotoPath: string | null = null;
       if (fotoFile) {
-        fotoPath = `${safeNome}_${timestamp}/${fotoFile.name}`;
+        fotoPath = `${safeNome}_${timestamp}/${sanitizeFileName(fotoFile.name)}`;
         const { error: fotoError } = await supabase.storage
           .from("submissions")
           .upload(fotoPath, fotoFile);
-        if (fotoError) throw new Error("Erro ao enviar foto do autor");
+        if (fotoError) throw new Error(`Erro ao enviar foto: ${fotoError.message}`);
       }
 
       // Insert submission record
-      const submissionId = crypto.randomUUID();
+      const submissionId = generateUUID();
       const { error: insertError } = await supabase
         .from("submissions")
         .insert({
@@ -155,7 +177,7 @@ const EnvioPage = () => {
 
       if (insertError) {
         console.error("Insert error:", JSON.stringify(insertError));
-        throw new Error("Erro ao registrar submissão");
+        throw new Error(`Erro ao registrar submissão: ${insertError.message}`);
       }
 
       // Invoke edge function (fire and forget)
