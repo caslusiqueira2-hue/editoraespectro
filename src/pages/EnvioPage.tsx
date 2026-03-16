@@ -45,13 +45,25 @@ function sanitizeFileName(name: string): string {
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_DOC_TYPES = [
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "application/pdf",
-];
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
+const ACCEPTED_DOC_EXTENSIONS = ["doc", "docx", "pdf"];
+const ACCEPTED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png"];
 const GENEROS = ["Conto", "Crônica", "Poema", "Ensaio", "Resenha"] as const;
+
+function getFileExtension(name: string): string {
+  return name.split(".").pop()?.toLowerCase() || "";
+}
+
+function getContentType(ext: string): string {
+  const map: Record<string, string> = {
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    pdf: "application/pdf",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+  };
+  return map[ext] || "application/octet-stream";
+}
 
 const formSchema = z.object({
   nome: z.string().trim().min(1, "Nome é obrigatório").max(200),
@@ -90,7 +102,7 @@ const EnvioPage = () => {
     if (!textoFile) {
       errs.texto = "Arquivo do texto é obrigatório";
     } else {
-      if (!ACCEPTED_DOC_TYPES.includes(textoFile.type)) {
+      if (!ACCEPTED_DOC_EXTENSIONS.includes(getFileExtension(textoFile.name))) {
         errs.texto = "Apenas arquivos .doc, .docx ou .pdf são aceitos";
       }
       if (textoFile.size > MAX_FILE_SIZE) {
@@ -98,7 +110,7 @@ const EnvioPage = () => {
       }
     }
     if (fotoFile) {
-      if (!ACCEPTED_IMAGE_TYPES.includes(fotoFile.type)) {
+      if (!ACCEPTED_IMAGE_EXTENSIONS.includes(getFileExtension(fotoFile.name))) {
         errs.foto = "Apenas imagens JPG ou PNG são aceitas";
       }
       if (fotoFile.size > MAX_FILE_SIZE) {
@@ -145,7 +157,9 @@ const EnvioPage = () => {
       const textoPath = `${safeNome}_${timestamp}/${sanitizeFileName(textoFile!.name)}`;
       const { error: textoError } = await supabase.storage
         .from("submissions")
-        .upload(textoPath, textoFile!);
+        .upload(textoPath, textoFile!, {
+          contentType: getContentType(getFileExtension(textoFile!.name)),
+        });
 
       if (textoError) throw new Error(`Erro ao enviar arquivo do texto: ${textoError.message}`);
 
@@ -155,7 +169,9 @@ const EnvioPage = () => {
         fotoPath = `${safeNome}_${timestamp}/${sanitizeFileName(fotoFile.name)}`;
         const { error: fotoError } = await supabase.storage
           .from("submissions")
-          .upload(fotoPath, fotoFile);
+          .upload(fotoPath, fotoFile, {
+            contentType: getContentType(getFileExtension(fotoFile.name)),
+          });
         if (fotoError) throw new Error(`Erro ao enviar foto: ${fotoError.message}`);
       }
 
