@@ -157,7 +157,9 @@ const EnvioPage = () => {
       const textoPath = `${safeNome}_${timestamp}/${sanitizeFileName(textoFile!.name)}`;
       const { error: textoError } = await supabase.storage
         .from("submissions")
-        .upload(textoPath, textoFile!);
+        .upload(textoPath, textoFile!, {
+          contentType: getContentType(getFileExtension(textoFile!.name)),
+        });
 
       if (textoError) throw new Error(`Erro ao enviar arquivo do texto: ${textoError.message}`);
 
