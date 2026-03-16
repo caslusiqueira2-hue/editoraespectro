@@ -102,7 +102,7 @@ const EnvioPage = () => {
     if (!textoFile) {
       errs.texto = "Arquivo do texto é obrigatório";
     } else {
-      if (!ACCEPTED_DOC_TYPES.includes(textoFile.type)) {
+      if (!ACCEPTED_DOC_EXTENSIONS.includes(getFileExtension(textoFile.name))) {
         errs.texto = "Apenas arquivos .doc, .docx ou .pdf são aceitos";
       }
       if (textoFile.size > MAX_FILE_SIZE) {
