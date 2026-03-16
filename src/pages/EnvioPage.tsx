@@ -138,22 +138,20 @@ const EnvioPage = () => {
       }
 
       // Insert submission record
-      const insertPayload = {
-        nome: result.data.nome,
-        email: result.data.email,
-        genero: result.data.genero,
-        titulo: result.data.titulo,
-        mensagem: result.data.mensagem || null,
-        texto_url: textoPath,
-        foto_url: fotoPath,
-        destino,
-      };
-      console.log("Insert payload:", insertPayload);
-      const { data: submission, error: insertError } = await supabase
+      const submissionId = crypto.randomUUID();
+      const { error: insertError } = await supabase
         .from("submissions")
-        .insert(insertPayload as any)
-        .select("id")
-        .single();
+        .insert({
+          id: submissionId,
+          nome: result.data.nome,
+          email: result.data.email,
+          genero: result.data.genero,
+          titulo: result.data.titulo,
+          mensagem: result.data.mensagem || null,
+          texto_url: textoPath,
+          foto_url: fotoPath,
+          destino,
+        });
 
       if (insertError) {
         console.error("Insert error:", JSON.stringify(insertError));
@@ -162,7 +160,7 @@ const EnvioPage = () => {
 
       // Invoke edge function (fire and forget)
       supabase.functions.invoke("handle-submission", {
-        body: { submission_id: submission.id },
+        body: { submission_id: submissionId },
       }).catch(() => {});
 
       setSuccess(true);
