@@ -85,6 +85,7 @@ const EnvioPage = () => {
   const [genero, setGenero] = useState("");
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [instagram, setInstagram] = useState("");
   const [textoFile, setTextoFile] = useState<File | null>(null);
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [honeypot, setHoneypot] = useState("");
@@ -188,6 +189,7 @@ const EnvioPage = () => {
           mensagem: result.data.mensagem || null,
           texto_url: textoPath,
           foto_url: fotoPath,
+          instagram: instagram.trim() || null,
           destino,
         });
 
@@ -408,6 +410,23 @@ const EnvioPage = () => {
                 maxLength={300}
               />
               {errors.titulo && <p className="text-sm text-destructive">{errors.titulo}</p>}
+            </div>
+
+            {/* Instagram */}
+            <div className="space-y-2">
+              <Label htmlFor="instagram">Instagram <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">@</span>
+                <Input
+                  id="instagram"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value.replace(/^@/, ""))}
+                  placeholder="seu.usuario"
+                  maxLength={60}
+                  className="pl-7"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground italic">Informe seu @ do Instagram para divulgação</p>
             </div>
 
             {/* Mensagem */}

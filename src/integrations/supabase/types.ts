@@ -263,6 +263,7 @@ export type Database = {
           foto_url: string | null
           genero: string
           id: string
+          instagram: string | null
           mensagem: string | null
           nome: string
           texto_url: string
@@ -275,6 +276,7 @@ export type Database = {
           foto_url?: string | null
           genero: string
           id?: string
+          instagram?: string | null
           mensagem?: string | null
           nome: string
           texto_url: string
@@ -287,6 +289,7 @@ export type Database = {
           foto_url?: string | null
           genero?: string
           id?: string
+          instagram?: string | null
           mensagem?: string | null
           nome?: string
           texto_url?: string
