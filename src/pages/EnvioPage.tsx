@@ -142,7 +142,7 @@ const EnvioPage = () => {
       const safeNome = nome.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
 
       // Upload text file
-      const textoPath = `${safeNome}_${timestamp}/${textoFile!.name}`;
+      const textoPath = `${safeNome}_${timestamp}/${sanitizeFileName(textoFile!.name)}`;
       const { error: textoError } = await supabase.storage
         .from("submissions")
         .upload(textoPath, textoFile!);
