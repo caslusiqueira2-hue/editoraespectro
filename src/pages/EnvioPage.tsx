@@ -177,7 +177,7 @@ const EnvioPage = () => {
 
       if (insertError) {
         console.error("Insert error:", JSON.stringify(insertError));
-        throw new Error("Erro ao registrar submissão");
+        throw new Error(`Erro ao registrar submissão: ${insertError.message}`);
       }
 
       // Invoke edge function (fire and forget)
