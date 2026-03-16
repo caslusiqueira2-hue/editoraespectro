@@ -110,7 +110,7 @@ const EnvioPage = () => {
       }
     }
     if (fotoFile) {
-      if (!ACCEPTED_IMAGE_TYPES.includes(fotoFile.type)) {
+      if (!ACCEPTED_IMAGE_EXTENSIONS.includes(getFileExtension(fotoFile.name))) {
         errs.foto = "Apenas imagens JPG ou PNG são aceitas";
       }
       if (fotoFile.size > MAX_FILE_SIZE) {
