@@ -156,11 +156,11 @@ const EnvioPage = () => {
         const { error: fotoError } = await supabase.storage
           .from("submissions")
           .upload(fotoPath, fotoFile);
-        if (fotoError) throw new Error("Erro ao enviar foto do autor");
+        if (fotoError) throw new Error(`Erro ao enviar foto: ${fotoError.message}`);
       }
 
       // Insert submission record
-      const submissionId = crypto.randomUUID();
+      const submissionId = generateUUID();
       const { error: insertError } = await supabase
         .from("submissions")
         .insert({
