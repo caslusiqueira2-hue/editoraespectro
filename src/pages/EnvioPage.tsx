@@ -169,7 +169,9 @@ const EnvioPage = () => {
         fotoPath = `${safeNome}_${timestamp}/${sanitizeFileName(fotoFile.name)}`;
         const { error: fotoError } = await supabase.storage
           .from("submissions")
-          .upload(fotoPath, fotoFile);
+          .upload(fotoPath, fotoFile, {
+            contentType: getContentType(getFileExtension(fotoFile.name)),
+          });
         if (fotoError) throw new Error(`Erro ao enviar foto: ${fotoError.message}`);
       }
 
