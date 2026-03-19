@@ -12,8 +12,7 @@ import AdminNewsletter from "@/components/AdminNewsletter";
 import AdminMagazine from "@/components/AdminMagazine";
 import AdminSubmissions from "@/components/AdminSubmissions";
 import { usePostViewCount } from "@/hooks/useAnalytics";
-
-const ADMIN_EMAIL = "christianlucas12@gmail.com";
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || "christianlucas12@gmail.com";
 
 const AdminPage = () => {
   const { user, loading: authLoading, signIn, signUp, signOut } = useAuth();

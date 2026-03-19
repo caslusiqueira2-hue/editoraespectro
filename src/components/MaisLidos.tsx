@@ -76,7 +76,7 @@ function MaisLidosItem({
         to={`/artigo/${post.slug}`}
         className="flex items-start gap-2.5 py-1 transition-colors"
       >
-        <span className="text-accent font-black text-sm leading-5 shrink-0 w-4 text-right">
+        <span className="text-accent font-black text-sm leading-5 shrink-0 min-w-[1.5rem] text-right">
           {index + 1}
         </span>
         <div className="min-w-0 flex-1">

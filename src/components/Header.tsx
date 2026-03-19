@@ -73,7 +73,7 @@ const Header = () => {
             </Link>
 
             {/* Desktop nav */}
-            <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+            <nav className="hidden lg:flex flex-1 justify-center items-center gap-1 px-4">
               {navCategories.map((cat) => (
                 <Link
                   key={cat.slug}
