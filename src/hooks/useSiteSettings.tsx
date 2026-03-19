@@ -9,8 +9,8 @@ export function useSiteSetting(key: string) {
         .from("site_settings")
         .select("value")
         .eq("key", key)
-        .single();
-      if (error) return true; // default visible
+        .maybeSingle();
+      if (error || !data) return true; // default visible
       return data.value as boolean;
     },
   });
@@ -22,8 +22,10 @@ export function useUpdateSiteSetting() {
     mutationFn: async ({ key, value }: { key: string; value: boolean }) => {
       const { error } = await supabase
         .from("site_settings")
-        .update({ value: value as any, updated_at: new Date().toISOString() })
-        .eq("key", key);
+        .upsert(
+          { key, value: value as any, updated_at: new Date().toISOString() },
+          { onConflict: "key" }
+        );
       if (error) throw error;
     },
     onSuccess: (_, { key }) => qc.invalidateQueries({ queryKey: ["site_settings", key] }),
