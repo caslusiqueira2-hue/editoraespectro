@@ -11,6 +11,7 @@ import { usePosts } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import capaBV from "@/assets/capa-boas-vindas.jpg";
+import { useSiteSetting } from "@/hooks/useSiteSettings";
 
 const Index = () => {
   const { data: posts, isLoading } = usePosts(true);
@@ -18,12 +19,18 @@ const Index = () => {
   useDocumentTitle();
   const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
 
+  const { data: heroVisible } = useSiteSetting("home_hero_visible");
+  const { data: recentesVisible } = useSiteSetting("home_recentes_visible");
+  const { data: maislidosVisible } = useSiteSetting("home_maislidos_visible");
+  const { data: newsletterVisible } = useSiteSetting("home_newsletter_visible");
+  const { data: quotebarVisible } = useSiteSetting("home_quotebar_visible");
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
       {/* Hero */}
-      {heroArticle && (
+      {heroVisible !== false && heroArticle && (
         <section className="relative min-h-[60vh] sm:min-h-[75vh] md:min-h-[85vh] overflow-hidden flex items-end sm:items-center">
           <img
             src={heroArticle.imagem_url || capaBV}
@@ -68,15 +75,18 @@ const Index = () => {
       {/* Articles Grid */}
       <main className="flex-1">
         <section className="max-w-7xl mx-auto px-4 md:px-8 py-12 sm:py-20">
-          <div className="flex items-end justify-between mb-8 sm:mb-12">
-            <AnimatedSection>
-              <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-                Publicações<br />recentes
-              </h2>
-            </AnimatedSection>
-          </div>
+          {recentesVisible !== false && (
+            <div className="flex items-end justify-between mb-8 sm:mb-12">
+              <AnimatedSection>
+                <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+                  Publicações<br />recentes
+                </h2>
+              </AnimatedSection>
+            </div>
+          )}
 
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-14">
+            {recentesVisible !== false && (
             <div className="flex-1">
               {isLoading ? (
                 <p className="text-center text-muted-foreground py-20">Carregando…</p>
@@ -103,22 +113,29 @@ const Index = () => {
                 </p>
               )}
             </div>
+            )}
 
+            {maislidosVisible !== false && (
             <aside className="lg:w-64 shrink-0 lg:border-l lg:border-border lg:pl-10">
               <div className="lg:sticky lg:top-24">
                 <MaisLidos />
               </div>
             </aside>
+            )}
           </div>
         </section>
 
+        {newsletterVisible !== false && (
         <AnimatedSection>
           <section className="max-w-3xl mx-auto px-4 md:px-8 pb-12 sm:pb-20">
             <NewsletterBox />
           </section>
         </AnimatedSection>
+        )}
 
+        {quotebarVisible !== false && (
         <QuoteBar />
+        )}
       </main>
 
       <Footer />

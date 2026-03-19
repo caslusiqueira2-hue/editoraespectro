@@ -73,6 +73,11 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const deletePost = useDeletePost();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
   const { data: revistaVisible } = useSiteSetting("envio_revista_visible");
+  const { data: heroVisible } = useSiteSetting("home_hero_visible");
+  const { data: recentesVisible } = useSiteSetting("home_recentes_visible");
+  const { data: maislidosVisible } = useSiteSetting("home_maislidos_visible");
+  const { data: newsletterVisible } = useSiteSetting("home_newsletter_visible");
+  const { data: quotebarVisible } = useSiteSetting("home_quotebar_visible");
   const updateSetting = useUpdateSiteSetting();
 
   return (
@@ -129,6 +134,22 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
             >
               {revistaVisible === true ? "Habilitado" : "Desabilitado"}
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Home Sections bar */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4">
+        <div className="bg-card border border-border rounded-xl p-4">
+          <h3 className="text-sm font-bold uppercase tracking-wider mb-4 text-muted-foreground flex items-center gap-2">
+            Visibilidade da Home Page
+          </h3>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <SettingToggle label="Hero/Destaque" isVisible={heroVisible} optionKey="home_hero_visible" updateSetting={updateSetting} />
+            <SettingToggle label="Recentes" isVisible={recentesVisible} optionKey="home_recentes_visible" updateSetting={updateSetting} />
+            <SettingToggle label="Mais Lidos" isVisible={maislidosVisible} optionKey="home_maislidos_visible" updateSetting={updateSetting} />
+            <SettingToggle label="Newsletter" isVisible={newsletterVisible} optionKey="home_newsletter_visible" updateSetting={updateSetting} />
+            <SettingToggle label="Citação" isVisible={quotebarVisible} optionKey="home_quotebar_visible" updateSetting={updateSetting} />
           </div>
         </div>
       </div>
@@ -452,6 +473,28 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
           <RichEditor content={conteudoHtml} onChange={setConteudoHtml} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function SettingToggle({ label, isVisible, optionKey, updateSetting }: { label: string, isVisible: boolean | undefined, optionKey: string, updateSetting: any }) {
+  return (
+    <div className="flex items-center gap-2 sm:gap-3">
+      <span className="text-sm text-foreground flex-1">{label}</span>
+      <button
+        onClick={() => {
+          const newVal = isVisible === false ? true : false;
+          updateSetting.mutate({ key: optionKey, value: newVal });
+          toast.success(newVal ? `${label} visível` : `${label} oculto`);
+        }}
+        className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full transition-all shrink-0 ${
+          isVisible !== false
+            ? "bg-accent/15 text-accent border border-accent/30"
+            : "bg-secondary text-muted-foreground border border-border"
+        }`}
+      >
+        {isVisible !== false ? "Visível" : "Oculto"}
+      </button>
     </div>
   );
 }
