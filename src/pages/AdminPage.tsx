@@ -78,6 +78,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
   const { data: maislidosVisible } = useSiteSetting("home_maislidos_visible");
   const { data: newsletterVisible } = useSiteSetting("home_newsletter_visible");
   const { data: quotebarVisible } = useSiteSetting("home_quotebar_visible");
+  const { data: navVisible } = useSiteSetting("home_nav_visible");
   const updateSetting = useUpdateSiteSetting();
 
   return (
@@ -145,6 +146,7 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
             Visibilidade da Home Page
           </h3>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <SettingToggle label="Barra de Nav" isVisible={navVisible} optionKey="home_nav_visible" updateSetting={updateSetting} />
             <SettingToggle label="Hero/Destaque" isVisible={heroVisible} optionKey="home_hero_visible" updateSetting={updateSetting} />
             <SettingToggle label="Recentes" isVisible={recentesVisible} optionKey="home_recentes_visible" updateSetting={updateSetting} />
             <SettingToggle label="Mais Lidos" isVisible={maislidosVisible} optionKey="home_maislidos_visible" updateSetting={updateSetting} />

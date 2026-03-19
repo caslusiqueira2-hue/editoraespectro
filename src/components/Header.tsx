@@ -14,6 +14,7 @@ const Header = () => {
   const { data: posts } = usePosts(true);
   const { data: categories } = useCategories();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
+  const { data: navVisible } = useSiteSetting("home_nav_visible");
   const { theme, toggleTheme } = useTheme();
 
   const navCategories = categories?.filter(c => c.slug !== "") || [];
@@ -73,6 +74,7 @@ const Header = () => {
             </Link>
 
             {/* Desktop nav */}
+            {navVisible !== false && (
             <nav className="hidden lg:flex flex-1 justify-center items-center gap-1 px-4">
               {navCategories.map((cat) => (
                 <Link
@@ -90,6 +92,7 @@ const Header = () => {
                 Revista
               </Link>
             </nav>
+            )}
 
             {/* Desktop actions */}
             <div className="hidden md:flex items-center gap-3 z-10">
