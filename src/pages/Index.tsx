@@ -20,15 +20,17 @@ const Index = () => {
   const [visibleCount, setVisibleCount] = useState(6);
   useTrackPageView("/", "home");
   useDocumentTitle();
-  const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
-  const recentPosts = posts?.filter(p => p.id !== heroArticle?.id) || [];
-  const displayedPosts = recentPosts.slice(0, visibleCount);
-
   const { data: heroVisible } = useSiteSetting("home_hero_visible");
   const { data: recentesVisible } = useSiteSetting("home_recentes_visible");
   const { data: maislidosVisible } = useSiteSetting("home_maislidos_visible");
   const { data: newsletterVisible } = useSiteSetting("home_newsletter_visible");
   const { data: quotebarVisible } = useSiteSetting("home_quotebar_visible");
+
+  const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
+  const recentPosts = (heroVisible !== false && heroArticle) 
+    ? posts?.filter(p => p.id !== heroArticle?.id) || []
+    : posts || [];
+  const displayedPosts = recentPosts.slice(0, visibleCount);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
