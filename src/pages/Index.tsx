@@ -17,9 +17,11 @@ import { useSiteSetting } from "@/hooks/useSiteSettings";
 
 const Index = () => {
   const { data: posts, isLoading } = usePosts(true);
+  const [visibleCount, setVisibleCount] = useState(6);
   useTrackPageView("/", "home");
   useDocumentTitle();
   const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
+  const displayedPosts = posts?.slice(0, visibleCount);
 
   const { data: heroVisible } = useSiteSetting("home_hero_visible");
   const { data: recentesVisible } = useSiteSetting("home_recentes_visible");
