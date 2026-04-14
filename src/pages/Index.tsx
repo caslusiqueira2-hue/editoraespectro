@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
@@ -7,6 +8,7 @@ import ArticleCard from "@/components/ArticleCard";
 import MaisLidos from "@/components/MaisLidos";
 import NewsletterBox from "@/components/NewsletterBox";
 import AnimatedSection from "@/components/AnimatedSection";
+import { Button } from "@/components/ui/button";
 import { usePosts } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
@@ -15,15 +17,20 @@ import { useSiteSetting } from "@/hooks/useSiteSettings";
 
 const Index = () => {
   const { data: posts, isLoading } = usePosts(true);
+  const [visibleCount, setVisibleCount] = useState(6);
   useTrackPageView("/", "home");
   useDocumentTitle();
-  const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
-
   const { data: heroVisible } = useSiteSetting("home_hero_visible");
   const { data: recentesVisible } = useSiteSetting("home_recentes_visible");
   const { data: maislidosVisible } = useSiteSetting("home_maislidos_visible");
   const { data: newsletterVisible } = useSiteSetting("home_newsletter_visible");
   const { data: quotebarVisible } = useSiteSetting("home_quotebar_visible");
+
+  const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
+  const recentPosts = (heroVisible !== false && heroArticle) 
+    ? posts?.filter(p => p.id !== heroArticle?.id) || []
+    : posts || [];
+  const displayedPosts = recentPosts.slice(0, visibleCount);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -91,19 +98,33 @@ const Index = () => {
               {isLoading ? (
                 <p className="text-center text-muted-foreground py-20">Carregando…</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {posts?.map((artigo, i) => (
-                    <AnimatedSection key={artigo.id} delay={i * 0.08}>
-                      <ArticleCard artigo={{
-                        slug: artigo.slug,
-                        titulo: artigo.titulo,
-                        resumo: artigo.resumo,
-                        categoria: artigo.categories?.nome || "",
-                        imagem: artigo.imagem_url || capaBV,
-                        autor: artigo.autor,
-                      }} />
-                    </AnimatedSection>
-                  ))}
+                <div className="space-y-12">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {displayedPosts?.map((artigo, i) => (
+                      <AnimatedSection key={artigo.id} delay={i * 0.08}>
+                        <ArticleCard artigo={{
+                          slug: artigo.slug,
+                          titulo: artigo.titulo,
+                          resumo: artigo.resumo,
+                          categoria: artigo.categories?.nome || "",
+                          imagem: artigo.imagem_url || capaBV,
+                          autor: artigo.autor,
+                        }} />
+                      </AnimatedSection>
+                    ))}
+                  </div>
+
+                  {recentPosts.length > visibleCount && (
+                    <div className="flex justify-center mt-12">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setVisibleCount(prev => prev + 6)}
+                        className="rounded-full px-8 py-6 uppercase tracking-widest text-xs font-bold border-muted-foreground/30 hover:bg-accent hover:text-accent-foreground transition-all duration-300 shadow-sm hover:shadow-md"
+                      >
+                        Ver mais antigos
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
 
