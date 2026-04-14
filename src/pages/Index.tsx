@@ -95,19 +95,33 @@ const Index = () => {
               {isLoading ? (
                 <p className="text-center text-muted-foreground py-20">Carregando…</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {posts?.map((artigo, i) => (
-                    <AnimatedSection key={artigo.id} delay={i * 0.08}>
-                      <ArticleCard artigo={{
-                        slug: artigo.slug,
-                        titulo: artigo.titulo,
-                        resumo: artigo.resumo,
-                        categoria: artigo.categories?.nome || "",
-                        imagem: artigo.imagem_url || capaBV,
-                        autor: artigo.autor,
-                      }} />
-                    </AnimatedSection>
-                  ))}
+                <div className="space-y-12">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {displayedPosts?.map((artigo, i) => (
+                      <AnimatedSection key={artigo.id} delay={i * 0.08}>
+                        <ArticleCard artigo={{
+                          slug: artigo.slug,
+                          titulo: artigo.titulo,
+                          resumo: artigo.resumo,
+                          categoria: artigo.categories?.nome || "",
+                          imagem: artigo.imagem_url || capaBV,
+                          autor: artigo.autor,
+                        }} />
+                      </AnimatedSection>
+                    ))}
+                  </div>
+
+                  {posts && posts.length > visibleCount && (
+                    <div className="flex justify-center mt-12">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setVisibleCount(prev => prev + 6)}
+                        className="rounded-full px-8 py-6 uppercase tracking-widest text-xs font-bold border-muted-foreground/30 hover:bg-accent hover:text-accent-foreground transition-all duration-300 shadow-sm hover:shadow-md"
+                      >
+                        Ver mais antigos
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
 
