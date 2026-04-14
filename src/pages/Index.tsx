@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
@@ -7,6 +8,7 @@ import ArticleCard from "@/components/ArticleCard";
 import MaisLidos from "@/components/MaisLidos";
 import NewsletterBox from "@/components/NewsletterBox";
 import AnimatedSection from "@/components/AnimatedSection";
+import { Button } from "@/components/ui/button";
 import { usePosts } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
