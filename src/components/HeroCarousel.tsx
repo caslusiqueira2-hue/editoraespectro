@@ -136,29 +136,7 @@ const HeroCarousel = ({ posts, isLoading }: HeroCarouselProps) => {
       {/* Progress Indicators */}
       <div className="absolute bottom-8 left-0 right-0 z-20">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="flex gap-3 h-1 max-w-sm">
-            {heroPosts.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentIndex(i)}
-                className="flex-1 h-full bg-foreground/10 overflow-hidden rounded-full transition-all"
-                aria-label={`Slide ${i + 1}`}
-              >
-                <motion.div
-                  className="h-full bg-accent"
-                  initial={{ width: "0%" }}
-                  animate={{ 
-                    width: i === currentIndex ? "100%" : i < currentIndex ? "100%" : "0%" 
-                  }}
-                  transition={{ 
-                    duration: i === currentIndex ? 6 : 0.3, 
-                    ease: "linear" 
-                  }}
-                />
-              </button>
-            ))}
-          </div>
-          <div className="mt-4 flex items-center gap-4 text-[10px] font-bold text-muted-foreground tracking-[3px] font-[family-name:var(--font-ui)]">
+          <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground tracking-[3px] font-[family-name:var(--font-ui)]">
             <span className="text-foreground">0{currentIndex + 1}</span>
             <div className="w-8 h-[1px] bg-muted-foreground/30" />
             <span>0{heroPosts.length}</span>
