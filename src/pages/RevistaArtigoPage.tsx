@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import AnimatedSection from "@/components/AnimatedSection";
+import OptimizedImage from "@/components/OptimizedImage";
 import { useMagazineArticle, useVolumeArticles } from "@/hooks/useMagazine";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
@@ -73,7 +74,12 @@ const RevistaArtigoPage = () => {
 
       {article.imagem_url && (
         <div className="relative h-[35vh] sm:h-[50vh] min-h-[250px] overflow-hidden">
-          <img src={article.imagem_url} alt={article.titulo} className="absolute inset-0 w-full h-full object-cover" loading="eager" />
+          <OptimizedImage 
+            src={article.imagem_url} 
+            alt={article.titulo} 
+            priority
+            containerClassName="absolute inset-0 w-full h-full"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         </div>
       )}
