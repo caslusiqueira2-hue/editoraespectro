@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import AnimatedSection from "@/components/AnimatedSection";
+import OptimizedImage from "@/components/OptimizedImage";
 import { useVolumes } from "@/hooks/useMagazine";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
@@ -75,11 +76,11 @@ const RevistaPage = () => {
                 >
                   {vol.capa_url ? (
                     <div className="aspect-[3/4] overflow-hidden">
-                      <img
+                      <OptimizedImage
                         src={vol.capa_url}
                         alt={vol.titulo}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
+                        aspectRatio="3/4"
+                        className="group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
                   ) : (
