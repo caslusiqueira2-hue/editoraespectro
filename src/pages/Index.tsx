@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import ArticleCard from "@/components/ArticleCard";
+import OptimizedImage from "@/components/OptimizedImage";
 import MaisLidos from "@/components/MaisLidos";
 import NewsletterBox from "@/components/NewsletterBox";
 import AnimatedSection from "@/components/AnimatedSection";
@@ -39,10 +40,12 @@ const Index = () => {
       {/* Hero */}
       {heroVisible !== false && heroArticle && (
         <section className="relative min-h-[60vh] sm:min-h-[75vh] md:min-h-[85vh] overflow-hidden flex items-end sm:items-center">
-          <img
+          <OptimizedImage
             src={heroArticle.imagem_url || capaBV}
             alt={heroArticle.titulo}
-            className="absolute inset-0 w-full h-full object-cover scale-105"
+            priority
+            containerClassName="absolute inset-0 w-full h-full"
+            className="scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
