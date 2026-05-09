@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import ArticleCard from "@/components/ArticleCard";
 import OptimizedImage from "@/components/OptimizedImage";
+import HeroCarousel from "@/components/HeroCarousel";
 import MaisLidos from "@/components/MaisLidos";
 import NewsletterBox from "@/components/NewsletterBox";
 import AnimatedSection from "@/components/AnimatedSection";
@@ -27,9 +28,9 @@ const Index = () => {
   const { data: newsletterVisible } = useSiteSetting("home_newsletter_visible");
   const { data: quotebarVisible } = useSiteSetting("home_quotebar_visible");
 
-  const heroArticle = posts?.find((a) => a.destaque) || posts?.[0];
-  const recentPosts = (heroVisible !== false && heroArticle) 
-    ? posts?.filter(p => p.id !== heroArticle?.id) || []
+  const heroPosts = posts?.slice(0, 5) || [];
+  const recentPosts = (heroVisible !== false && heroPosts.length > 0) 
+    ? posts?.slice(5) || []
     : posts || [];
   const displayedPosts = recentPosts.slice(0, visibleCount);
 
@@ -38,48 +39,8 @@ const Index = () => {
       <Header />
 
       {/* Hero */}
-      {heroVisible !== false && heroArticle && (
-        <section className="relative min-h-[60vh] sm:min-h-[75vh] md:min-h-[85vh] overflow-hidden flex items-end sm:items-center">
-          <OptimizedImage
-            src={heroArticle.imagem_url || capaBV}
-            alt={heroArticle.titulo}
-            priority
-            containerClassName="absolute inset-0 w-full h-full"
-            className="scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
-
-          <div className="relative z-10 w-full pb-10 sm:pb-0">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="max-w-7xl mx-auto px-4 md:px-8"
-            >
-              <span className="inline-block text-[10px] font-semibold uppercase tracking-[4px] text-accent mb-3 sm:mb-4 font-[family-name:var(--font-ui)]">
-                {heroArticle.categories?.nome}
-              </span>
-              <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-foreground leading-[0.95] max-w-3xl italic">
-                {heroArticle.titulo}
-              </h1>
-              <p className="mt-4 sm:mt-6 text-muted-foreground text-sm sm:text-base max-w-lg leading-relaxed">
-                {heroArticle.resumo}
-              </p>
-              <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-4">
-                <Link
-                  to={`/artigo/${heroArticle.slug}`}
-                  className="bg-accent text-accent-foreground px-6 sm:px-8 py-3 text-sm font-bold uppercase tracking-wider rounded-full hover:opacity-90 transition-opacity font-[family-name:var(--font-ui)]"
-                >
-                  Explorar
-                </Link>
-                <span className="text-xs text-muted-foreground tracking-widest font-[family-name:var(--font-ui)]">
-                  por {heroArticle.autor}
-                </span>
-              </div>
-            </motion.div>
-          </div>
-        </section>
+      {heroVisible !== false && (
+        <HeroCarousel posts={posts || []} isLoading={isLoading} />
       )}
 
       {/* Articles Grid */}
