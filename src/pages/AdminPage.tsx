@@ -331,7 +331,7 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
   };
 
   const handleSave = async () => {
-    if (!titulo || !slug || !autor || !categoriaId || !resumo) {
+    if (!titulo || !slug || !autor || !categoriaId) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -339,7 +339,7 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
     try {
       const payload = {
         titulo, subtitulo: subtitulo || null, slug, autor, categoria_id: categoriaId,
-        resumo, conteudo: conteudoHtml as any, imagem_url: imagemUrl || null, published, destaque,
+        resumo: resumo || null, conteudo: conteudoHtml as any, imagem_url: imagemUrl || null, published, destaque,
       };
 
       const wasPublished = post?.published;
