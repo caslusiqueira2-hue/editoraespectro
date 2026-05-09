@@ -11,6 +11,15 @@ import MaisLidos from "@/components/MaisLidos";
 import OptimizedImage from "@/components/OptimizedImage";
 
 const ArtigoPage = () => {
+  const getOptimizedUrl = (url: string, width?: number) => {
+    if (!url.includes("supabase.co/storage/v1/object/public/")) return url;
+    const params = new URLSearchParams();
+    if (width) params.append("width", width.toString());
+    params.append("quality", "80");
+    params.append("format", "webp");
+    return `${url}?${params.toString()}`;
+  };
+
   const { slug } = useParams();
   const { data: artigo, isLoading } = usePost(slug || "");
   useTrackPageView(`/artigo/${slug}`, "post", artigo?.id);
@@ -47,7 +56,8 @@ const ArtigoPage = () => {
       ? (artigo.conteudo as string[]).map(block => {
           if (typeof block === "string" && block.startsWith("[IMG]")) {
             const url = block.replace("[IMG]", "").replace("[/IMG]", "");
-            return `<img src="${encodeURI(url)}" loading="lazy" />`;
+            const optimizedUrl = getOptimizedUrl(encodeURI(url), 1200);
+            return `<img src="${optimizedUrl}" loading="lazy" class="w-full rounded-lg shadow-lg my-8" />`;
           }
           if (typeof block === "string" && block.startsWith("**") && block.endsWith("**")) {
             return `<p><strong>${block.replace(/\*\*/g, "")}</strong></p>`;
