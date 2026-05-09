@@ -188,7 +188,7 @@ export type Database = {
           id: string
           imagem_url: string | null
           published: boolean
-          resumo: string
+          resumo: string | null
           slug: string
           subtitulo: string | null
           titulo: string
@@ -203,7 +203,7 @@ export type Database = {
           id?: string
           imagem_url?: string | null
           published?: boolean
-          resumo: string
+          resumo?: string | null
           slug: string
           subtitulo?: string | null
           titulo: string
@@ -218,7 +218,7 @@ export type Database = {
           id?: string
           imagem_url?: string | null
           published?: boolean
-          resumo?: string
+          resumo?: string | null
           slug?: string
           subtitulo?: string | null
           titulo?: string
