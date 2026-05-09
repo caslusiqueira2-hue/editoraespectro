@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import AnimatedSection from "@/components/AnimatedSection";
+import OptimizedImage from "@/components/OptimizedImage";
 import { useVolume, useVolumeArticles } from "@/hooks/useMagazine";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
@@ -77,7 +78,12 @@ const VolumePage = () => {
       {/* Cover + Hero */}
       {volume.capa_url && (
         <div className="relative h-[40vh] sm:h-[55vh] min-h-[280px] overflow-hidden">
-          <img src={volume.capa_url} alt={volume.titulo} className="absolute inset-0 w-full h-full object-cover" loading="eager" />
+          <OptimizedImage 
+            src={volume.capa_url} 
+            alt={volume.titulo} 
+            priority
+            containerClassName="absolute inset-0 w-full h-full"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         </div>
       )}
