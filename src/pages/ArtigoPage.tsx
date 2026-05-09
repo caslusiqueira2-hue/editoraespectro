@@ -8,6 +8,7 @@ import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { sanitizeHtml } from "@/lib/sanitize";
 import MaisLidos from "@/components/MaisLidos";
+import OptimizedImage from "@/components/OptimizedImage";
 
 const ArtigoPage = () => {
   const { slug } = useParams();
@@ -61,7 +62,12 @@ const ArtigoPage = () => {
 
       {artigo.imagem_url && (
         <div className="relative h-[35vh] sm:h-[50vh] min-h-[250px] sm:min-h-[350px] overflow-hidden">
-          <img src={artigo.imagem_url} alt={artigo.titulo} className="absolute inset-0 w-full h-full object-cover" loading="eager" />
+          <OptimizedImage 
+            src={artigo.imagem_url} 
+            alt={artigo.titulo} 
+            priority
+            containerClassName="absolute inset-0 w-full h-full"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         </div>
       )}
