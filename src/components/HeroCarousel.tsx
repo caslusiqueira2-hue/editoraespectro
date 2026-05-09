@@ -44,7 +44,7 @@ const HeroCarousel = ({ posts, isLoading }: HeroCarouselProps) => {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {heroPosts.map((post, index) => (
           index === currentIndex && (
             <motion.div
