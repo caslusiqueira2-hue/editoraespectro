@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import OptimizedImage from "./OptimizedImage";
 
 interface ArticleCardProps {
   artigo: {
@@ -15,11 +16,11 @@ const ArticleCard = ({ artigo }: ArticleCardProps) => (
   <article className="group">
     <Link to={`/artigo/${artigo.slug}`} className="block">
       <div className="aspect-[3/4] overflow-hidden rounded-xl bg-secondary relative">
-        <img
+        <OptimizedImage
           src={artigo.imagem}
           alt={artigo.titulo}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-          loading="lazy"
+          aspectRatio="3/4"
+          className="group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80" />
         <div className="absolute bottom-0 left-0 right-0 p-4">

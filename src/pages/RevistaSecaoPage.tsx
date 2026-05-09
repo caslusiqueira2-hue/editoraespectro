@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import AnimatedSection from "@/components/AnimatedSection";
+import OptimizedImage from "@/components/OptimizedImage";
 import { useAllMagazineArticlesBySection } from "@/hooks/useMagazine";
 import type { MagazineArticle } from "@/hooks/useMagazine";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
@@ -74,7 +75,11 @@ const RevistaSecaoPage = () => {
                   >
                     <div className="flex items-start gap-4">
                       {art.imagem_url && (
-                        <img src={art.imagem_url} alt="" className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg shrink-0" loading="lazy" />
+                        <OptimizedImage 
+                          src={art.imagem_url} 
+                          alt="" 
+                          containerClassName="w-16 h-16 sm:w-20 sm:h-20 rounded-lg shrink-0" 
+                        />
                       )}
                       <div className="min-w-0">
                         <span className="text-[10px] font-bold uppercase tracking-[3px] text-accent font-[family-name:var(--font-ui)]">
