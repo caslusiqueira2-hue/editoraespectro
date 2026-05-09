@@ -117,6 +117,7 @@ const OptimizedImage = ({
           className={cn(
             "w-full h-full object-cover transition-all duration-1000 ease-out",
             !isLoaded ? "opacity-0 scale-[1.02]" : "opacity-100 scale-100",
+            isLoaded && "brightness-[1.01] contrast-[1.03]",
             className
           )}
           {...props}
