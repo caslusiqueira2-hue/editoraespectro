@@ -68,6 +68,7 @@ const HeroCarousel = ({ posts, isLoading }: HeroCarouselProps) => {
                   priority={index === 0}
                   containerClassName="w-full h-full"
                   className="w-full h-full object-cover"
+                  sizes="100vw"
                 />
               </motion.div>
 
