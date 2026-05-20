@@ -42,14 +42,11 @@ const AdminPage = () => {
               setLoading(true);
               
               if (isSignUp) {
-                // Check if email is allowed to sign up
-                const { data, error: checkError } = await supabase
-                  .from("user_roles")
-                  .select("email")
-                  .ilike("email", email.trim())
-                  .maybeSingle();
+                // Check if email is allowed to sign up through a secure backend helper
+                const { data, error: checkError } = await (supabase as any)
+                  .rpc("is_admin_email_allowed", { _email: email.trim() });
 
-                if (checkError || !data) {
+                if (checkError || data !== true) {
                   setAuthError("Este e-mail não tem permissão de administrador.");
                   setLoading(false);
                   return;
