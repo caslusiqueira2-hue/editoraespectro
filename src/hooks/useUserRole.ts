@@ -18,43 +18,11 @@ export function useUserRole() {
       }
 
       try {
-        const { data: idData, error: idError } = await supabase
-          .from("user_roles")
-          .select("role, email")
-          .eq("user_id", user.id)
-          .maybeSingle();
+        const { data, error } = await (supabase as any).rpc("get_current_admin_role");
 
-        if (!idError && idData) {
-          setRole(idData.role as UserRole);
-          setLoading(false);
-          return;
-        }
+        if (error) throw error;
 
-        // Fallback to email if user_id link isn't established yet
-        if (user.email) {
-          const { data: emailData, error: emailError } = await supabase
-            .from("user_roles")
-            .select("role, id")
-            .ilike("email", user.email.trim())
-            .maybeSingle();
-
-          if (!emailError && emailData) {
-            setRole(emailData.role as UserRole);
-            
-            // Link the user_id if it's missing or different
-            await supabase
-              .from("user_roles")
-              .update({ user_id: user.id })
-              .eq("id", emailData.id);
-              
-            setLoading(false);
-            return;
-          }
-          if (emailError) console.error("Error fetching role by email:", emailError);
-        }
-
-        console.log("No role found for user");
-        setRole(null);
+        setRole(data === "main_admin" || data === "admin" ? data : null);
       } catch (err) {
         console.error("Unexpected error fetching role:", err);
         setRole(null);
