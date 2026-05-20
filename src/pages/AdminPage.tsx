@@ -92,10 +92,11 @@ const AdminPage = () => {
   if (!role) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 max-w-sm">
           <h1 className="font-[family-name:var(--font-display)] text-2xl font-black text-foreground uppercase">Acesso negado</h1>
-          <p className="text-muted-foreground text-sm">Você não tem permissão para acessar esta área.</p>
-          <button onClick={signOut} className="text-accent hover:underline text-sm font-bold uppercase tracking-widest">Sair</button>
+          <p className="text-muted-foreground text-sm">O e-mail <strong>{user.email}</strong> não tem permissão de administrador no sistema.</p>
+          <p className="text-xs text-muted-foreground opacity-50">Se você deveria ter acesso, entre em contato com o administrador principal.</p>
+          <button onClick={signOut} className="w-full bg-secondary text-foreground py-3 rounded-lg font-bold uppercase tracking-wider text-sm hover:opacity-90 transition-opacity">Sair e tentar outro e-mail</button>
         </div>
       </div>
     );
