@@ -22,8 +22,9 @@ const Header = () => {
   const results = searchQuery.length > 1
     ? (posts || []).filter(
         (a) =>
-          a.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.resumo.toLowerCase().includes(searchQuery.toLowerCase())
+          (a.titulo || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (a.resumo || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (a.autor || "").toLowerCase().includes(searchQuery.toLowerCase())
       )
     : [];
 
