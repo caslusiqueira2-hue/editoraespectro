@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Instagram } from "lucide-react";
 
-const ADMIN_EMAIL = "christianlucas12@gmail.com";
+
 
 const Footer = () => {
   const [clickCount, setClickCount] = useState(0);

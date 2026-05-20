@@ -1,75 +1,116 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePosts, useCategories, useCreatePost, useUpdatePost, useDeletePost, uploadPostImage } from "@/hooks/usePosts";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSetting, useUpdateSiteSetting } from "@/hooks/useSiteSettings";
+import { useUserRole } from "@/hooks/useUserRole";
 import type { Post } from "@/hooks/usePosts";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText, BookOpen, Inbox } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, Eye, EyeOff, Star, Upload, X, FileText, BookOpen, Inbox, Users } from "lucide-react";
 import RichEditor from "@/components/RichEditor";
 import AdminAnalytics from "@/components/AdminAnalytics";
 import AdminNewsletter from "@/components/AdminNewsletter";
 import AdminMagazine from "@/components/AdminMagazine";
 import AdminSubmissions from "@/components/AdminSubmissions";
+import AdminUsersManagement from "@/components/AdminUsersManagement";
 import { usePostViewCount } from "@/hooks/useAnalytics";
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || "christianlucas12@gmail.com";
+
 
 const AdminPage = () => {
   const { user, loading: authLoading, signIn, signUp, signOut } = useAuth();
+  const { role, loading: roleLoading } = useUserRole();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Carregando…</div>;
+  if (authLoading || (user && roleLoading)) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Carregando…</div>;
 
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <div className="w-full max-w-sm space-y-6">
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-black text-foreground uppercase text-center">Admin</h1>
+          <div className="text-center space-y-2">
+            <h1 className="font-[family-name:var(--font-display)] text-3xl font-black text-foreground uppercase">Admin</h1>
+            <p className="text-muted-foreground text-xs uppercase tracking-widest">{isSignUp ? "Criar Senha" : "Login"}</p>
+          </div>
           <form
             onSubmit={async (e) => {
               e.preventDefault();
               setAuthError("");
-              const { error } = await signIn(email, password);
-              if (error) setAuthError(error.message);
+              setLoading(true);
+              
+              if (isSignUp) {
+                // Check if email is allowed to sign up
+                const { data, error: checkError } = await supabase
+                  .from("user_roles")
+                  .select("email")
+                  .eq("email", email.toLowerCase())
+                  .single();
+
+                if (checkError || !data) {
+                  setAuthError("Este e-mail não tem permissão de administrador.");
+                  setLoading(false);
+                  return;
+                }
+
+                const { error } = await signUp(email, password);
+                if (error) setAuthError(error.message);
+                else toast.success("Conta criada! Você já pode entrar.");
+              } else {
+                const { error } = await signIn(email, password);
+                if (error) setAuthError(error.message);
+              }
+              setLoading(false);
             }}
             className="space-y-4"
           >
             <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-secondary text-foreground px-4 py-3 rounded-lg border border-border outline-none focus:ring-2 focus:ring-accent" />
+              className="w-full bg-secondary text-foreground px-4 py-3 rounded-lg border border-border outline-none focus:ring-2 focus:ring-accent" required />
             <input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-secondary text-foreground px-4 py-3 rounded-lg border border-border outline-none focus:ring-2 focus:ring-accent" />
+              className="w-full bg-secondary text-foreground px-4 py-3 rounded-lg border border-border outline-none focus:ring-2 focus:ring-accent" required />
             {authError && <p className="text-destructive text-sm">{authError}</p>}
-            <button type="submit" className="w-full bg-accent text-accent-foreground py-3 rounded-lg font-bold uppercase tracking-wider text-sm hover:opacity-90 transition-opacity">
-              Entrar
+            <button type="submit" disabled={loading} className="w-full bg-accent text-accent-foreground py-3 rounded-lg font-bold uppercase tracking-wider text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+              {loading ? "Carregando..." : (isSignUp ? "Criar conta" : "Entrar")}
             </button>
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-muted-foreground hover:text-accent text-xs uppercase tracking-wider font-bold"
+              >
+                {isSignUp ? "Já tem uma conta? Entre aqui" : "Novo admin? Crie sua senha aqui"}
+              </button>
+            </div>
           </form>
         </div>
       </div>
     );
   }
 
-  if (user.email !== ADMIN_EMAIL) {
+  if (!role) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <div className="text-center space-y-4">
           <h1 className="font-[family-name:var(--font-display)] text-2xl font-black text-foreground uppercase">Acesso negado</h1>
           <p className="text-muted-foreground text-sm">Você não tem permissão para acessar esta área.</p>
-          <button onClick={signOut} className="text-accent hover:underline text-sm">Sair</button>
+          <button onClick={signOut} className="text-accent hover:underline text-sm font-bold uppercase tracking-widest">Sair</button>
         </div>
       </div>
     );
   }
 
-  return <AdminDashboard onSignOut={signOut} />;
+  return <AdminDashboard onSignOut={signOut} role={role} />;
 };
 
-function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
+
+function AdminDashboard({ onSignOut, role }: { onSignOut: () => void; role: "main_admin" | "admin" }) {
   const { data: posts, isLoading } = usePosts();
   const [editing, setEditing] = useState<Post | null>(null);
   const [creating, setCreating] = useState(false);
-  const [activeTab, setActiveTab] = useState<"posts" | "revista" | "submissoes">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "revista" | "submissoes" | "usuarios">("posts");
+
   const deletePost = useDeletePost();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
   const { data: revistaVisible } = useSiteSetting("envio_revista_visible");
@@ -195,15 +236,29 @@ function AdminDashboard({ onSignOut }: { onSignOut: () => void }) {
           >
             <Inbox size={14} className="inline mr-1.5" /> Submissões
           </button>
+          {role === "main_admin" && (
+            <button
+              onClick={() => setActiveTab("usuarios")}
+              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+                activeTab === "usuarios" ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Users size={14} className="inline mr-1.5" /> Usuários
+            </button>
+          )}
         </div>
       </div>
 
+
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-4 pb-8">
-        {activeTab === "submissoes" ? (
+        {activeTab === "usuarios" ? (
+          <AdminUsersManagement />
+        ) : activeTab === "submissoes" ? (
           <AdminSubmissions />
         ) : activeTab === "revista" ? (
           <AdminMagazine />
         ) : (
+
           <>
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-[family-name:var(--font-display)] text-lg sm:text-xl font-black uppercase">Posts</h2>
