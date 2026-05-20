@@ -18,8 +18,6 @@ export function useUserRole() {
       }
 
       try {
-        // First try by user_id
-        console.log("Fetching role for user ID:", user.id);
         const { data: idData, error: idError } = await supabase
           .from("user_roles")
           .select("role, email")
@@ -27,17 +25,13 @@ export function useUserRole() {
           .maybeSingle();
 
         if (!idError && idData) {
-          console.log("Found role by ID:", idData.role);
           setRole(idData.role as UserRole);
           setLoading(false);
           return;
         }
 
-        if (idError) console.error("Error fetching role by ID:", idError);
-
         // Fallback to email if user_id link isn't established yet
         if (user.email) {
-          console.log("Fetching role for email:", user.email);
           const { data: emailData, error: emailError } = await supabase
             .from("user_roles")
             .select("role, id")
@@ -45,10 +39,9 @@ export function useUserRole() {
             .maybeSingle();
 
           if (!emailError && emailData) {
-            console.log("Found role by email:", emailData.role);
             setRole(emailData.role as UserRole);
             
-            // Link the user_id if it's missing
+            // Link the user_id if it's missing or different
             await supabase
               .from("user_roles")
               .update({ user_id: user.id })
