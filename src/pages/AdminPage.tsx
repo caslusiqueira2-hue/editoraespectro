@@ -259,17 +259,35 @@ function AdminDashboard({ onSignOut, role }: { onSignOut: () => void; role: "mai
         ) : (
 
           <>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <h2 className="font-[family-name:var(--font-display)] text-lg sm:text-xl font-black uppercase">Posts</h2>
-              <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity">
-                <Plus size={16} /> Novo post
-              </button>
+              <div className="flex flex-1 max-w-md gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    placeholder="Pesquisar posts..."
+                    value={adminSearch}
+                    onChange={(e) => setAdminSearch(e.target.value)}
+                    className="w-full bg-secondary border border-border rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-accent"
+                  />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <Eye size={16} /> {/* Using Eye as a temporary icon if Search is not available, but Search is in lucide-react */}
+                  </div>
+                </div>
+                <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity whitespace-nowrap">
+                  <Plus size={16} /> Novo post
+                </button>
+              </div>
             </div>
             {isLoading ? (
               <p className="text-muted-foreground">Carregando posts…</p>
             ) : (
               <div className="space-y-3">
-                {posts?.map((post) => (
+                {posts?.filter(post => 
+                  post.titulo.toLowerCase().includes(adminSearch.toLowerCase()) ||
+                  post.autor.toLowerCase().includes(adminSearch.toLowerCase()) ||
+                  (post.resumo || "").toLowerCase().includes(adminSearch.toLowerCase())
+                ).map((post) => (
                   <PostRow key={post.id} post={post} onEdit={() => setEditing(post)} onDelete={async () => {
                     if (confirm("Deletar este post?")) {
                       await deletePost.mutateAsync(post.id);
@@ -278,6 +296,13 @@ function AdminDashboard({ onSignOut, role }: { onSignOut: () => void; role: "mai
                   }} />
                 ))}
                 {posts?.length === 0 && <p className="text-muted-foreground text-center py-12">Nenhum post ainda. Clique em "Novo post" para começar.</p>}
+                {posts && posts.length > 0 && posts.filter(post => 
+                  post.titulo.toLowerCase().includes(adminSearch.toLowerCase()) ||
+                  post.autor.toLowerCase().includes(adminSearch.toLowerCase()) ||
+                  (post.resumo || "").toLowerCase().includes(adminSearch.toLowerCase())
+                ).length === 0 && (
+                  <p className="text-muted-foreground text-center py-12">Nenhum post encontrado para "{adminSearch}".</p>
+                )}
               </div>
             )}
           </>
