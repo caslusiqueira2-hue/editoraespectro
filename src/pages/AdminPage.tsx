@@ -46,8 +46,8 @@ const AdminPage = () => {
                 const { data, error: checkError } = await supabase
                   .from("user_roles")
                   .select("email")
-                  .eq("email", email.toLowerCase())
-                  .single();
+                  .ilike("email", email.trim())
+                  .maybeSingle();
 
                 if (checkError || !data) {
                   setAuthError("Este e-mail não tem permissão de administrador.");

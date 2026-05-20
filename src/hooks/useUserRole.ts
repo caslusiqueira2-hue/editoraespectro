@@ -11,25 +11,42 @@ export function useUserRole() {
 
   useEffect(() => {
     async function fetchRole() {
-      if (!user?.email) {
+      if (!user) {
         setRole(null);
         setLoading(false);
         return;
       }
 
       try {
-        const { data, error } = await supabase
+        // First try by user_id
+        const { data: idData, error: idError } = await supabase
           .from("user_roles")
           .select("role")
-          .eq("email", user.email)
-          .single();
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-        if (error) {
-          console.error("Error fetching role:", error);
-          setRole(null);
-        } else {
-          setRole(data.role as UserRole);
+        if (!idError && idData) {
+          setRole(idData.role as UserRole);
+          setLoading(false);
+          return;
         }
+
+        // Fallback to email if user_id link isn't established yet
+        if (user.email) {
+          const { data: emailData, error: emailError } = await supabase
+            .from("user_roles")
+            .select("role")
+            .ilike("email", user.email.trim())
+            .maybeSingle();
+
+          if (!emailError && emailData) {
+            setRole(emailData.role as UserRole);
+            setLoading(false);
+            return;
+          }
+        }
+
+        setRole(null);
       } catch (err) {
         console.error("Unexpected error fetching role:", err);
         setRole(null);
