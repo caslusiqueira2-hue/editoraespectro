@@ -271,7 +271,7 @@ function AdminDashboard({ onSignOut, role }: { onSignOut: () => void; role: "mai
                     className="w-full bg-secondary border border-border rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-accent"
                   />
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                    <Eye size={16} /> {/* Using Eye as a temporary icon if Search is not available, but Search is in lucide-react */}
+                    <Search size={16} />
                   </div>
                 </div>
                 <button onClick={() => setCreating(true)} className="flex items-center gap-2 bg-accent text-accent-foreground px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-opacity whitespace-nowrap">
