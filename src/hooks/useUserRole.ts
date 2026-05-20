@@ -21,14 +21,17 @@ export function useUserRole() {
         const { data, error } = await supabase
           .from("user_roles")
           .select("role")
-          .eq("email", user.email)
-          .single();
+          .ilike("email", user.email.trim())
+          .maybeSingle();
 
         if (error) {
           console.error("Error fetching role:", error);
           setRole(null);
-        } else {
+        } else if (data) {
           setRole(data.role as UserRole);
+        } else {
+          console.warn("No role found for email:", user.email);
+          setRole(null);
         }
       } catch (err) {
         console.error("Unexpected error fetching role:", err);
