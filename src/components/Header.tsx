@@ -21,9 +21,27 @@ const Header = () => {
 
   const results = searchQuery.length > 1
     ? (posts || []).filter(
-        (a) =>
-          a.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.resumo.toLowerCase().includes(searchQuery.toLowerCase())
+        (a) => {
+          const query = searchQuery.toLowerCase();
+          const titulo = (a.titulo || "").toLowerCase();
+          const resumo = (a.resumo || "").toLowerCase();
+          const autor = (a.autor || "").toLowerCase();
+          const categoria = (a.categories?.nome || "").toLowerCase();
+          
+          // Strip HTML from conteudo for searching
+          const conteudoRaw = typeof a.conteudo === "string" 
+            ? a.conteudo.replace(/<[^>]*>/g, "") 
+            : Array.isArray(a.conteudo) 
+              ? a.conteudo.join(" ") 
+              : "";
+          const conteudo = conteudoRaw.toLowerCase();
+          
+          return titulo.includes(query) || 
+                 resumo.includes(query) || 
+                 autor.includes(query) || 
+                 categoria.includes(query) || 
+                 conteudo.includes(query);
+        }
       )
     : [];
 
