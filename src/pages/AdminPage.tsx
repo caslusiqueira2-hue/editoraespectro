@@ -107,6 +107,7 @@ function AdminDashboard({ onSignOut, role }: { onSignOut: () => void; role: "mai
   const { data: posts, isLoading } = usePosts();
   const [editing, setEditing] = useState<Post | null>(null);
   const [creating, setCreating] = useState(false);
+  const [adminSearch, setAdminSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"posts" | "revista" | "submissoes" | "usuarios">("posts");
 
   const deletePost = useDeletePost();
