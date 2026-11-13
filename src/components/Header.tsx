@@ -1,177 +1,148 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Search, X, Menu, Sun, Moon } from "lucide-react";
-import { usePosts, useCategories } from "@/hooks/usePosts";
+import { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { ArrowUpRight, Menu, Moon, Search, Sun, X } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { usePublishedMagazineArticles } from "@/hooks/useMagazine";
+import { useCategories, usePosts } from "@/hooks/usePosts";
 import { useSiteSetting } from "@/hooks/useSiteSettings";
 import { useTheme } from "@/hooks/useTheme";
-import logoEspectro from "@/assets/logo-espectro.png";
+import { ARTIGOS } from "@/data/artigos";
+import { MAGAZINE_SECTIONS, plainText, searchTerms } from "@/lib/editorial";
 
-const Header = () => {
+const manifesto = ARTIGOS[0];
+
+export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
-  const { data: posts } = usePosts(true);
+  const [query, setQuery] = useState("");
+  const searchButton = useRef<HTMLButtonElement>(null);
+  const { pathname } = useLocation();
   const { data: categories } = useCategories();
   const { data: envioVisible } = useSiteSetting("envio_page_visible");
   const { data: navVisible } = useSiteSetting("home_nav_visible");
   const { theme, toggleTheme } = useTheme();
 
-  const navCategories = categories?.filter(c => c.slug !== "") || [];
+  const normalizedQuery = searchTerms(query);
+  const terms = normalizedQuery.split(/\s+/);
+  const canSearch = searchOpen && normalizedQuery.length > 1;
+  const site = usePosts(true, canSearch);
+  const magazine = usePublishedMagazineArticles(undefined, canSearch);
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setQuery("");
+  };
 
-  const results = searchQuery.length > 1
-    ? (posts || []).filter(
-        (a) => {
-          const query = searchQuery.toLowerCase();
-          const titulo = (a.titulo || "").toLowerCase();
-          const resumo = (a.resumo || "").toLowerCase();
-          const autor = (a.autor || "").toLowerCase();
-          const categoria = (a.categories?.nome || "").toLowerCase();
-          
-          // Strip HTML from conteudo for searching
-          const conteudoRaw = typeof a.conteudo === "string" 
-            ? a.conteudo.replace(/<[^>]*>/g, "") 
-            : Array.isArray(a.conteudo) 
-              ? a.conteudo.join(" ") 
-              : "";
-          const conteudo = conteudoRaw.toLowerCase();
-          
-          return titulo.includes(query) || 
-                 resumo.includes(query) || 
-                 autor.includes(query) || 
-                 categoria.includes(query) || 
-                 conteudo.includes(query);
-        }
-      )
-    : [];
+  useEffect(() => {
+    setMenuOpen(false);
+    setSearchOpen(false);
+    setQuery("");
+  }, [pathname]);
+
+  const matches = (fields: (string | null | undefined)[]) => {
+    const text = searchTerms(fields.filter(Boolean).join(" "));
+    return terms.every((term) => text.includes(term));
+  };
+
+  const results = canSearch ? [
+    ...(site.data ?? []).filter((post) => matches([
+      post.titulo, post.autor, post.resumo, post.categories?.nome,
+      plainText(typeof post.conteudo === "string" ? post.conteudo : Array.isArray(post.conteudo) ? post.conteudo.join(" ") : ""),
+    ])).map((post) => ({
+      to: `/artigo/${post.slug}`, title: post.titulo, detail: post.categories?.nome || "Editora Espectro", author: post.autor,
+    })),
+    ...(site.data?.some((post) => post.slug === manifesto.slug) || !matches([
+      manifesto.titulo, manifesto.autor, manifesto.resumo, "Manifesto", manifesto.conteudo?.join(" "),
+    ]) ? [] : [{
+      to: `/artigo/${manifesto.slug}`, title: manifesto.titulo, detail: "Manifesto", author: manifesto.autor,
+    }]),
+    ...(magazine.data ?? []).flatMap((article) => {
+      const volume = article.magazine_volumes;
+      const section = MAGAZINE_SECTIONS[article.secao as keyof typeof MAGAZINE_SECTIONS] || article.secao;
+      return volume && matches([article.titulo, article.autor, article.secao, section, volume.titulo, "Revista", plainText(article.conteudo)])
+        ? [{ to: `/revista/${volume.slug}/${article.slug}`, title: article.titulo, detail: `Revista · ${section}`, author: article.autor }]
+        : [];
+    }),
+  ] : [];
 
   return (
     <>
-      {searchOpen && (
-        <div className="fixed inset-0 z-50 bg-background/98 backdrop-blur-xl flex flex-col items-center pt-16 sm:pt-24 px-4">
-          <button
-            onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Fechar busca"
-          >
-            <X size={28} />
-          </button>
+      <header className="editorial-header relative z-40 border-b border-border bg-background">
+        <div className="editorial-wrap flex min-h-16 items-center justify-between gap-2 py-2">
+          <Link to="/" aria-label="Espectro, início" className="text-2xl font-semibold tracking-tight [font-family:var(--font-display)] sm:text-3xl">
+            Espectro<span className="text-accent">.</span>
+          </Link>
+          <div className="flex items-center gap-1 sm:gap-3">
+            <NavLink to="/revista" className="editorial-nav-link px-2 sm:px-3">Revista</NavLink>
+            {envioVisible !== false && (
+              <NavLink to="/envio" className="editorial-nav-link hidden items-center gap-1 border-l border-border pl-4 pr-2 sm:inline-flex">
+                Enviar originais <ArrowUpRight aria-hidden="true" size={14} />
+              </NavLink>
+            )}
+            <button ref={searchButton} type="button" className="editorial-icon" aria-label="Buscar" aria-haspopup="dialog" onClick={() => setSearchOpen(true)}>
+              <Search size={19} aria-hidden="true" />
+            </button>
+            <button type="button" className="editorial-icon" aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"} onClick={toggleTheme}>
+              {theme === "dark" ? <Sun size={19} aria-hidden="true" /> : <Moon size={19} aria-hidden="true" />}
+            </button>
+            <button type="button" className="editorial-icon lg:hidden" aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="editorial-nav" onClick={() => setMenuOpen((open) => !open)}>
+              {menuOpen ? <X size={21} aria-hidden="true" /> : <Menu size={21} aria-hidden="true" />}
+            </button>
+          </div>
+        </div>
+        <div id="editorial-nav" className={`${menuOpen ? "block" : "hidden"} ${navVisible !== false ? "lg:block" : ""} border-t border-border`}>
+          <nav aria-label="Editorias" className="editorial-wrap flex flex-wrap gap-x-6 gap-y-1 py-2 lg:items-center">
+            <NavLink to="/" end className="editorial-nav-link py-2" onClick={() => setMenuOpen(false)}>Início</NavLink>
+            {navVisible !== false && categories?.filter((category) => category.slug).map((category) => (
+              <NavLink key={category.id} to={`/categoria/${category.slug}`} className="editorial-nav-link py-2" onClick={() => setMenuOpen(false)}>
+                {category.nome}
+              </NavLink>
+            ))}
+            <NavLink to={`/artigo/${manifesto.slug}`} className="editorial-nav-link py-2" onClick={() => setMenuOpen(false)}>Manifesto</NavLink>
+            {envioVisible !== false && (
+              <NavLink to="/envio" className="editorial-nav-link py-2 sm:hidden" onClick={() => setMenuOpen(false)}>Enviar originais</NavLink>
+            )}
+          </nav>
+        </div>
+      </header>
+
+      <Dialog open={searchOpen} onOpenChange={(open) => open ? setSearchOpen(true) : closeSearch()}>
+        <DialogContent
+          className="w-[calc(100%_-_2rem)] max-w-2xl gap-3 p-5 sm:p-8"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            searchButton.current?.focus();
+          }}
+        >
+          <DialogTitle className="text-3xl font-normal">Buscar na Espectro</DialogTitle>
+          <DialogDescription>Textos da editora e da revista por título, autoria ou assunto.</DialogDescription>
           <input
             type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar artigos…"
-            autoFocus
-            className="w-full max-w-xl text-xl sm:text-3xl bg-transparent border-b-2 border-accent pb-4 outline-none font-[family-name:var(--font-display)] placeholder:text-muted-foreground text-foreground"
+            aria-label="Buscar textos"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Digite pelo menos dois caracteres"
+            className="min-w-0 border-b border-accent bg-transparent py-3 text-lg" autoFocus
           />
-          <div className="w-full max-w-xl mt-6 sm:mt-8 space-y-2 overflow-y-auto flex-1 pb-8">
-            {results.map((a) => (
-              <button
-                key={a.id}
-                onClick={() => { navigate(`/artigo/${a.slug}`); setSearchOpen(false); setSearchQuery(""); }}
-                className="block w-full text-left p-4 sm:p-5 rounded-lg hover:bg-secondary transition-colors"
-              >
-                <span className="text-[10px] font-bold uppercase tracking-[3px] text-accent">{a.categories?.nome}</span>
-                <h3 className="font-[family-name:var(--font-display)] text-base sm:text-lg font-bold mt-1 text-foreground">{a.titulo}</h3>
-                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{a.resumo}</p>
-              </button>
-            ))}
-            {searchQuery.length > 1 && results.length === 0 && (
-              <p className="text-muted-foreground text-center py-8">Nenhum resultado encontrado.</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      <header className="bg-background/80 backdrop-blur-md sticky top-0 z-40 border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            {/* Logo */}
-            <Link to="/" className="flex-shrink-0 z-10">
-              <img src={logoEspectro} alt="Espectro" className={`h-10 sm:h-12 w-auto transition-all duration-300 ${theme === "light" ? "invert" : ""}`} />
-            </Link>
-
-            {/* Desktop nav */}
-            {navVisible !== false && (
-            <nav className="hidden lg:flex flex-1 justify-center items-center gap-1 px-4">
-              {navCategories.map((cat) => (
-                <Link
-                  key={cat.slug}
-                  to={`/categoria/${cat.slug}`}
-                  className="px-3 py-1.5 text-xs font-semibold uppercase tracking-[2px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap font-[family-name:var(--font-ui)]"
-                >
-                  {cat.nome}
-                </Link>
-              ))}
-              <Link
-                to="/revista"
-                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-[2px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap font-[family-name:var(--font-ui)]"
-              >
-                Revista
-              </Link>
-            </nav>
-            )}
-
-            {/* Desktop actions */}
-            <div className="hidden md:flex items-center gap-3 z-10">
-              <button onClick={toggleTheme} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Alternar tema">
-                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-              <button onClick={() => setSearchOpen(true)} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Buscar">
-                <Search size={18} />
-              </button>
-              {envioVisible !== false && (
-                <Link to="/envio" className="bg-accent text-accent-foreground text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full hover:opacity-90 transition-opacity whitespace-nowrap">
-                  Enviar texto
-                </Link>
-              )}
+          {canSearch && (
+            <div className="max-h-[50dvh] overflow-y-auto" aria-live="polite">
+              {(site.isLoading || magazine.isLoading) && <p className="py-4 text-muted-foreground">Buscando textos…</p>}
+              {(site.isError || magazine.isError) && <p className="py-4 text-muted-foreground">Parte do acervo está indisponível no momento.</p>}
+              {site.isSuccess && magazine.isSuccess && results.length === 0 && <p className="py-4 text-muted-foreground">Nenhum texto encontrado.</p>}
+              <ul className="divide-y divide-border">
+                {results.map((result) => (
+                  <li key={result.to}>
+                    <Link to={result.to} onClick={closeSearch} className="block px-1 py-3 hover:text-accent">
+                      <span className="editorial-label block">{result.detail}</span>
+                      <span className="mt-1 block text-2xl leading-tight [font-family:var(--font-display)]">{result.title}</span>
+                      <span className="text-sm text-muted-foreground">{result.author}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-
-            {/* Mobile actions */}
-            <div className="flex md:hidden items-center gap-1 z-10">
-              <button onClick={toggleTheme} className="p-2 text-foreground" aria-label="Alternar tema">
-                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-              <button onClick={() => setSearchOpen(true)} className="p-2 text-foreground" aria-label="Buscar">
-                <Search size={20} />
-              </button>
-              <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 text-foreground" aria-label="Menu">
-                {menuOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden border-t border-border bg-background p-6 space-y-3 animate-in slide-in-from-top-2 duration-200">
-            <Link to="/" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors">
-              Início
-            </Link>
-            {navCategories.map((cat) => (
-              <Link
-                key={cat.slug}
-                to={`/categoria/${cat.slug}`}
-                onClick={() => setMenuOpen(false)}
-                className="block py-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors"
-              >
-                {cat.nome}
-              </Link>
-            ))}
-            <Link to="/revista" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors">
-              Revista
-            </Link>
-            {envioVisible !== false && (
-              <Link to="/envio" onClick={() => setMenuOpen(false)}
-                className="block mt-4 bg-accent text-accent-foreground text-sm font-bold px-4 py-3 rounded-full text-center uppercase tracking-wider">
-                Enviar texto
-              </Link>
-            )}
-          </div>
-        )}
-      </header>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
-};
-
-export default Header;
+}

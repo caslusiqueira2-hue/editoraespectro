@@ -1,5 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
@@ -10,33 +9,15 @@ import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { sanitizeHtml } from "@/lib/sanitize";
 
-const SECTION_ORDER = ["conto", "poesia", "ensaio", "resenha"];
-const SECTION_LABELS: Record<string, string> = {
-  conto: "Contos",
-  poesia: "Poesia",
-  ensaio: "Ensaios",
-  resenha: "Resenhas",
-};
-
-const toRoman = (n: number) => {
-  const numerals = [
-    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
-    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
-    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
-  ] as const;
-  let result = "";
-  let num = n;
-  for (const [value, symbol] of numerals) {
-    while (num >= value) { result += symbol; num -= value; }
-  }
-  return result;
-};
+import EditorialStatus from "@/components/EditorialStatus";
+import { MAGAZINE_SECTIONS, volumeNumber } from "@/lib/editorial";
 
 const VolumePage = () => {
   const { volumeSlug } = useParams();
-  const navigate = useNavigate();
-  const { data: volume, isLoading: volLoading } = useVolume(volumeSlug || "");
-  const { data: articles } = useVolumeArticles(volume?.id, true);
+  const volumeQuery = useVolume(volumeSlug || "");
+  const { data: volume, isLoading: volLoading } = volumeQuery;
+  const articlesQuery = useVolumeArticles(volume?.id, true);
+  const { data: articles } = articlesQuery;
   useTrackPageView(`/revista/${volumeSlug}`, "revista-volume", volume?.id);
   useDocumentTitle(volume ? `${volume.titulo} — Revista Espectro` : undefined);
 
@@ -48,6 +29,10 @@ const VolumePage = () => {
         <Footer />
       </div>
     );
+  }
+
+  if (!volume && volumeQuery.isError) {
+    return <div className="flex min-h-screen flex-col"><Header /><main className="editorial-wrap flex-1 py-10"><EditorialStatus retry={() => volumeQuery.refetch()}>Não foi possível carregar este volume.</EditorialStatus></main><Footer /></div>;
   }
 
   if (!volume) {
@@ -65,42 +50,27 @@ const VolumePage = () => {
     );
   }
 
-  const grouped = SECTION_ORDER.reduce<Record<string, typeof articles>>((acc, sec) => {
-    const items = articles?.filter((a) => a.secao === sec) || [];
-    if (items.length > 0) acc[sec] = items;
-    return acc;
-  }, {});
+  const sections = [...new Set([...Object.keys(MAGAZINE_SECTIONS), ...(articles ?? []).map((article) => article.secao)])];
+  const grouped = sections.map((section) => ({
+    section,
+    items: (articles ?? []).filter((article) => article.secao === section),
+  })).filter(({ items }) => items.length > 0);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      {/* Cover + Hero */}
-      {volume.capa_url && (
-        <div className="relative h-[40vh] sm:h-[55vh] min-h-[280px] overflow-hidden">
-          <OptimizedImage 
-            src={volume.capa_url} 
-            alt={volume.titulo} 
-            priority
-            containerClassName="absolute inset-0 w-full h-full"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+      <div className="editorial-wrap pt-6 sm:pt-10">
+        <div className="grid items-center gap-7 border-y border-foreground py-6 sm:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] sm:gap-10">
+          {volume.capa_url && (
+            <OptimizedImage src={volume.capa_url} alt="" aspectRatio="3/4" priority containerClassName="max-w-[16rem]" className="object-contain" />
+          )}
+          <div className={volume.capa_url ? "min-w-0" : "min-w-0 sm:col-span-2"}>
+            <p className="editorial-label">Revista Espectro · Volume {volumeNumber(volume.numero)} · {volume.ano}</p>
+            <h1 className="editorial-headline mt-4">{volume.titulo}</h1>
+          </div>
         </div>
-      )}
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={`max-w-4xl mx-auto px-4 md:px-8 ${volume.capa_url ? "-mt-16 sm:-mt-24" : "mt-12"} relative z-10`}
-      >
-        <span className="text-[10px] font-bold uppercase tracking-[4px] text-accent font-[family-name:var(--font-ui)]">
-          Volume {toRoman(volume.numero)} · {volume.ano}
-        </span>
-        <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl sm:text-5xl md:text-6xl font-bold text-foreground italic">
-          {volume.titulo}
-        </h1>
-      </motion.div>
+      </div>
 
       {/* Breadcrumb */}
       <nav className="max-w-4xl mx-auto px-4 md:px-8 mt-4 text-xs text-muted-foreground uppercase tracking-wider" aria-label="Breadcrumb">
@@ -130,7 +100,7 @@ const VolumePage = () => {
                 Editorial
               </h2>
               <div
-                className="prose-editor text-foreground/85"
+                className="prose-editor editorial-reading text-foreground/90"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(volume.editorial) }}
               />
             </div>
@@ -144,23 +114,27 @@ const VolumePage = () => {
               Sumário
             </h2>
 
-            {Object.keys(grouped).length === 0 ? (
+            {articlesQuery.isLoading ? (
+              <EditorialStatus>Carregando o sumário…</EditorialStatus>
+            ) : articlesQuery.isError && !articles ? (
+              <EditorialStatus retry={() => articlesQuery.refetch()}>Não foi possível carregar o sumário.</EditorialStatus>
+            ) : grouped.length === 0 ? (
               <p className="text-muted-foreground font-[family-name:var(--font-body)] italic">
                 Nenhum artigo publicado neste volume.
               </p>
             ) : (
               <div className="space-y-10">
-                {Object.entries(grouped).map(([secao, items]) => (
+                {grouped.map(({ section: secao, items }) => (
                   <div key={secao}>
                     <h3 className="text-[10px] font-bold uppercase tracking-[4px] text-accent mb-4 font-[family-name:var(--font-ui)]">
-                      {SECTION_LABELS[secao] || secao}
+                      {MAGAZINE_SECTIONS[secao as keyof typeof MAGAZINE_SECTIONS] || secao}
                     </h3>
                     <div className="space-y-1">
                       {items?.map((art) => (
                         <Link
                           key={art.id}
                           to={`/revista/${volumeSlug}/${art.slug}`}
-                          className="group flex items-baseline gap-3 py-3 border-b border-border/50 hover:border-accent/30 transition-colors"
+                          className="group flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3 border-b border-border/50 hover:border-accent/30 transition-colors"
                         >
                           <span className="font-[family-name:var(--font-display)] text-base sm:text-lg font-semibold text-foreground group-hover:text-accent transition-colors">
                             {art.titulo}
@@ -183,13 +157,13 @@ const VolumePage = () => {
         <AnimatedSection delay={0.2}>
           <div className="mt-14 mb-10">
             <div className="flex flex-wrap items-center gap-3 justify-center">
-              {SECTION_ORDER.map((key) => (
+              {Object.entries(MAGAZINE_SECTIONS).map(([key, label]) => (
                 <Link
                   key={key}
                   to={`/revista/secao/${key}`}
                   className="text-[10px] font-bold uppercase tracking-[3px] text-muted-foreground hover:text-accent transition-colors font-[family-name:var(--font-ui)] border border-border rounded-full px-4 py-1.5 hover:border-accent/30"
                 >
-                  {SECTION_LABELS[key] || key}
+                  {label}
                 </Link>
               ))}
             </div>
@@ -199,17 +173,9 @@ const VolumePage = () => {
         {/* Read full edition button */}
         {articles && articles.length > 0 && (
           <div className="mt-4 text-center">
-            <button
-              className="border border-accent/30 text-accent px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wider hover:bg-accent hover:text-accent-foreground transition-all font-[family-name:var(--font-ui)]"
-              onClick={() => {
-                const firstArticle = articles[0];
-                if (firstArticle) {
-                  navigate(`/revista/${volumeSlug}/${firstArticle.slug}`);
-                }
-              }}
-            >
-              Ler edição completa
-            </button>
+            <Link to={`/revista/${volumeSlug}/${articles[0].slug}`} className="editorial-link">
+              Começar a leitura
+            </Link>
           </div>
         )}
       </main>

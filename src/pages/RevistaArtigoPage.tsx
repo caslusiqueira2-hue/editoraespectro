@@ -1,5 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import EditorialStatus from "@/components/EditorialStatus";
+import { volumeNumber } from "@/lib/editorial";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
@@ -17,23 +19,10 @@ const SECTION_LABELS: Record<string, string> = {
   resenha: "Resenha",
 };
 
-const toRoman = (n: number) => {
-  const numerals = [
-    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
-    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
-    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
-  ] as const;
-  let result = "";
-  let num = n;
-  for (const [value, symbol] of numerals) {
-    while (num >= value) { result += symbol; num -= value; }
-  }
-  return result;
-};
-
 const RevistaArtigoPage = () => {
   const { volumeSlug, artigoSlug } = useParams();
-  const { data: article, isLoading } = useMagazineArticle(volumeSlug || "", artigoSlug || "");
+  const query = useMagazineArticle(volumeSlug || "", artigoSlug || "");
+  const { data: article, isLoading } = query;
   const volume = article?.magazine_volumes;
   const { data: siblingArticles } = useVolumeArticles(volume?.id, true);
   useTrackPageView(`/revista/${volumeSlug}/${artigoSlug}`, "revista-artigo", article?.id);
@@ -47,6 +36,10 @@ const RevistaArtigoPage = () => {
         <Footer />
       </div>
     );
+  }
+
+  if (!article && query.isError) {
+    return <div className="flex min-h-screen flex-col"><Header /><main className="editorial-wrap flex-1 py-10"><EditorialStatus retry={() => query.refetch()}>Não foi possível carregar este texto da revista.</EditorialStatus></main><Footer /></div>;
   }
 
   if (!article || !volume) {
@@ -105,7 +98,7 @@ const RevistaArtigoPage = () => {
         <Link to="/revista" className="hover:text-accent transition-colors">Revista</Link>
         <span className="mx-2">›</span>
         <Link to={`/revista/${volumeSlug}`} className="hover:text-accent transition-colors">
-          Volume {toRoman(volume.numero)}
+          Volume {volumeNumber(volume.numero)}
         </Link>
         <span className="mx-2">›</span>
         <span className="text-foreground">{article.titulo}</span>
@@ -136,14 +129,14 @@ const RevistaArtigoPage = () => {
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Volume</span>
               <span className="text-sm font-bold mt-1 block text-foreground">
-                Vol. {toRoman(volume.numero)} — {volume.titulo}
+                Vol. {volumeNumber(volume.numero)} — {volume.titulo}
               </span>
             </div>
           </aside>
 
           {/* Article content */}
           <article
-            className="flex-1 prose-editor text-foreground/85 overflow-hidden"
+            className="flex-1 prose-editor editorial-reading min-w-0 text-foreground/90"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.conteudo) }}
           />
 
@@ -160,7 +153,7 @@ const RevistaArtigoPage = () => {
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Volume</span>
               <Link to={`/revista/${volumeSlug}`} className="text-sm font-bold mt-1 block text-accent hover:underline">
-                Vol. {toRoman(volume.numero)} — {volume.titulo}
+                Vol. {volumeNumber(volume.numero)} — {volume.titulo}
               </Link>
             </div>
 

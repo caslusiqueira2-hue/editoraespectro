@@ -151,11 +151,10 @@ const EnvioPage = () => {
     setSubmitting(true);
 
     try {
-      const timestamp = Date.now();
-      const safeNome = nome.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
+      const submissionId = generateUUID();
 
       // Upload text file
-      const textoPath = `${safeNome}_${timestamp}/${sanitizeFileName(textoFile!.name)}`;
+      const textoPath = `${submissionId}/texto/${sanitizeFileName(textoFile!.name)}`;
       const { error: textoError } = await supabase.storage
         .from("submissions")
         .upload(textoPath, textoFile!, {
@@ -167,7 +166,7 @@ const EnvioPage = () => {
       // Upload photo if provided
       let fotoPath: string | null = null;
       if (fotoFile) {
-        fotoPath = `${safeNome}_${timestamp}/${sanitizeFileName(fotoFile.name)}`;
+        fotoPath = `${submissionId}/foto/${sanitizeFileName(fotoFile.name)}`;
         const { error: fotoError } = await supabase.storage
           .from("submissions")
           .upload(fotoPath, fotoFile, {
@@ -177,7 +176,6 @@ const EnvioPage = () => {
       }
 
       // Insert submission record
-      const submissionId = generateUUID();
       const { error: insertError } = await supabase
         .from("submissions")
         .insert({
@@ -201,7 +199,9 @@ const EnvioPage = () => {
       // Invoke edge function (fire and forget)
       supabase.functions.invoke("handle-submission", {
         body: { submission_id: submissionId },
-      }).catch(() => {});
+      }).then(({ error }) => {
+        if (error) console.error("Falha no aviso de recebimento à equipe editorial", error.message);
+      }).catch((error) => console.error("Falha no aviso de recebimento à equipe editorial", error));
 
       setSuccess(true);
       setCooldown(true);

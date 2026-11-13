@@ -421,28 +421,12 @@ function PostEditor({ post, onClose }: { post: Post | null; onClose: () => void 
         resumo: resumo || null, conteudo: conteudoHtml as any, imagem_url: imagemUrl || null, published, destaque,
       };
 
-      const wasPublished = post?.published;
-
-      if (isEditing) {
-        const result = await updatePost.mutateAsync({ id: post!.id, ...payload });
+      if (isEditing && post) {
+        await updatePost.mutateAsync({ id: post.id, ...payload });
         toast.success("Post atualizado");
-
-        // Send newsletter if just published
-        if (published && !wasPublished) {
-          supabase.functions.invoke("send-newsletter", { body: { post_id: post!.id } })
-            .then(() => toast.success("Newsletter enviada aos inscritos!"))
-            .catch(() => {});
-        }
       } else {
-        const result = await createPost.mutateAsync(payload);
+        await createPost.mutateAsync(payload);
         toast.success("Post criado");
-
-        // Send newsletter if published on creation
-        if (published && result?.id) {
-          supabase.functions.invoke("send-newsletter", { body: { post_id: result.id } })
-            .then(() => toast.success("Newsletter enviada aos inscritos!"))
-            .catch(() => {});
-        }
       }
       onClose();
     } catch (err: any) {

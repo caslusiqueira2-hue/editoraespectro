@@ -5,36 +5,18 @@ import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import AnimatedSection from "@/components/AnimatedSection";
 import OptimizedImage from "@/components/OptimizedImage";
-import { useAllMagazineArticlesBySection } from "@/hooks/useMagazine";
+import { usePublishedMagazineArticles } from "@/hooks/useMagazine";
 import type { MagazineArticle } from "@/hooks/useMagazine";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
-const SECTION_LABELS: Record<string, string> = {
-  conto: "Contos",
-  poesia: "Poesia",
-  ensaio: "Ensaios",
-  resenha: "Resenhas",
-};
-
-const toRoman = (n: number) => {
-  const numerals = [
-    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
-    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
-    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
-  ] as const;
-  let result = "";
-  let num = n;
-  for (const [value, symbol] of numerals) {
-    while (num >= value) { result += symbol; num -= value; }
-  }
-  return result;
-};
+import EditorialStatus from "@/components/EditorialStatus";
+import { MAGAZINE_SECTIONS, volumeNumber } from "@/lib/editorial";
 
 const RevistaSecaoPage = () => {
   const { secao } = useParams();
   const { data: articles, isLoading } = useAllMagazineArticlesBySection(secao || "");
   const label = SECTION_LABELS[secao || ""] || secao;
-  useDocumentTitle(label ? `${label} — Revista Espectro` : undefined);
+  useDocumentTitle(label ? `${label || "Seção não encontrada"} — Revista Espectro` : undefined);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -57,9 +39,11 @@ const RevistaSecaoPage = () => {
           {label}
         </motion.h1>
 
-        {isLoading ? (
+        {!label ? null : query.isLoading ? (
           <p className="text-muted-foreground">Carregando…</p>
-        ) : articles?.length === 0 ? (
+        ) : query.isError && !query.data ? (
+          <EditorialStatus retry={() => query.refetch()}>Não foi possível carregar esta seção.</EditorialStatus>
+        ) : articles.length === 0 ? (
           <p className="text-muted-foreground font-[family-name:var(--font-body)] italic">
             Nenhum texto publicado nesta seção.
           </p>
@@ -67,11 +51,12 @@ const RevistaSecaoPage = () => {
           <div className="space-y-4">
             {articles?.map((art: MagazineArticle, i: number) => {
               const vol = art.magazine_volumes;
+              if (!vol) return null;
               return (
                 <AnimatedSection key={art.id} delay={i * 0.06}>
                   <Link
-                    to={`/revista/${vol?.slug}/${art.slug}`}
-                    className="group block p-5 border border-border rounded-xl hover:border-accent/30 transition-colors bg-card"
+                    to={`/revista/${vol.slug}/${art.slug}`}
+                    className="group block border-b border-border py-5 hover:border-accent"
                   >
                     <div className="flex items-start gap-4">
                       {art.imagem_url && (
@@ -83,7 +68,7 @@ const RevistaSecaoPage = () => {
                       )}
                       <div className="min-w-0">
                         <span className="text-[10px] font-bold uppercase tracking-[3px] text-accent font-[family-name:var(--font-ui)]">
-                          {vol ? `Volume ${toRoman(vol.numero)} — ${vol.titulo}` : ""}
+                          Volume {volumeNumber(vol.numero)} · {vol.titulo}
                         </span>
                         <h3 className="mt-1 font-[family-name:var(--font-display)] text-base sm:text-lg font-bold text-foreground group-hover:text-accent transition-colors">
                           {art.titulo}

@@ -1,73 +1,26 @@
-# Welcome to your Lovable project
+# Editora Espectro
 
-## Project info
+Site da editora e arquivo da Revista Espectro. O frontend usa React, TypeScript e Vite. O Supabase guarda os textos, as edições, os originais e as inscrições.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Desenvolvimento
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Use uma configuração Supabase de desenvolvimento e mantenha a chave de serviço no ambiente das funções, fora do frontend.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm ci
 npm run dev
+npm run test
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+O frontend usa `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY`. Para validar fluxos de escrita, use um banco e um bucket de teste.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Publicação
 
-**Use GitHub Codespaces**
+O repositório usa o fallback de rotas do Vercel em `vercel.json`. Para publicar a revisão editorial em um ambiente existente, coordene o frontend e a atualização do Supabase na mesma janela:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Valide a migração `20261113162500_editorial_flows.sql` em um ambiente de teste. Ela cria as funções de inscrição e ranking, restringe a edição aos papéis do painel e torna privado o bucket de originais. Os links públicos antigos de originais deixam de funcionar quando a migração é aplicada. O painel passa a baixar os arquivos com a sessão do administrador.
+2. Aplique a migração e publique as Edge Functions `handle-submission` e `send-newsletter`. A função de aviso de submissão usa `RESEND_API_KEY` e aceita `SUBMISSIONS_FROM_EMAIL` para o remetente verificado. `SITE_URL` permite incluir no aviso um link para o painel editorial.
+3. Publique o frontend e confira a leitura de edições, a busca, o formulário de originais e o download autenticado. Para inscrições, confirme o registro usando um e-mail de teste e repita a inscrição para verificar que ela é idempotente.
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+A Frequência Espectro registra inscrições. Para voltar a oferecer envio automático é preciso implementar a entrega com um provedor e um fluxo de cancelamento de inscrição. A função atual retorna indisponibilidade sem consultar a lista de e-mails.

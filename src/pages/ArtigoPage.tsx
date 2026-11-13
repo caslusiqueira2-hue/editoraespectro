@@ -1,5 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ARTIGOS } from "@/data/artigos";
+import EditorialStatus from "@/components/EditorialStatus";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
@@ -11,21 +13,18 @@ import MaisLidos from "@/components/MaisLidos";
 import OptimizedImage from "@/components/OptimizedImage";
 
 const ArtigoPage = () => {
-  const getOptimizedUrl = (url: string, width?: number) => {
-    if (!url.includes("supabase.co/storage/v1/object/public/")) return url;
-    const params = new URLSearchParams();
-    if (width) params.append("width", width.toString());
-    params.append("quality", "80");
-    params.append("format", "webp");
-    return `${url}?${params.toString()}`;
-  };
-
   const { slug } = useParams();
-  const { data: artigo, isLoading } = usePost(slug || "");
-  useTrackPageView(`/artigo/${slug}`, "post", artigo?.id);
+  const query = usePost(slug || "");
+  const manifesto = ARTIGOS.find((item) => item.slug === slug);
+  const artigo = query.data ?? (manifesto ? {
+    titulo: manifesto.titulo, subtitulo: manifesto.subtitulo, autor: manifesto.autor,
+    imagem_url: manifesto.imagem, conteudo: manifesto.conteudo,
+    created_at: "2026-02-21T12:00:00Z", categories: null,
+  } : undefined);
+  useTrackPageView(`/artigo/${slug}`, "post", query.data?.id);
   useDocumentTitle(artigo?.titulo);
 
-  if (isLoading) {
+  if (query.isLoading && !artigo) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
@@ -33,6 +32,10 @@ const ArtigoPage = () => {
         <Footer />
       </div>
     );
+  }
+
+  if (!artigo && query.isError) {
+    return <div className="flex min-h-screen flex-col"><Header /><main className="editorial-wrap flex-1 py-10"><EditorialStatus retry={() => query.refetch()}>Não foi possível carregar este texto.</EditorialStatus></main><Footer /></div>;
   }
 
   if (!artigo) {
@@ -56,8 +59,7 @@ const ArtigoPage = () => {
       ? (artigo.conteudo as string[]).map(block => {
           if (typeof block === "string" && block.startsWith("[IMG]")) {
             const url = block.replace("[IMG]", "").replace("[/IMG]", "");
-            const optimizedUrl = getOptimizedUrl(encodeURI(url), 1200);
-            return `<img src="${optimizedUrl}" loading="lazy" class="w-full rounded-lg shadow-lg my-8" />`;
+            return `<img src="${encodeURI(url).replace(/"/g, "&quot;")}" alt="" loading="lazy" />`;
           }
           if (typeof block === "string" && block.startsWith("**") && block.endsWith("**")) {
             return `<p><strong>${block.replace(/\*\*/g, "")}</strong></p>`;
@@ -89,7 +91,7 @@ const ArtigoPage = () => {
         className={`max-w-4xl mx-auto px-4 md:px-8 ${artigo.imagem_url ? "-mt-16 sm:-mt-20" : "mt-8 sm:mt-12"} relative z-10`}
       >
         <span className="inline-block text-[10px] font-bold uppercase tracking-[4px] text-accent mb-3">
-          {artigo.categories?.nome}
+          {artigo.categories?.nome || (manifesto ? "Manifesto" : "Editora Espectro")}
         </span>
         <h1 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-5xl font-bold leading-tight text-foreground">
           {artigo.titulo}
@@ -104,8 +106,7 @@ const ArtigoPage = () => {
       {/* Breadcrumb */}
       <nav className="max-w-4xl mx-auto px-4 md:px-8 mt-4 sm:mt-6 text-xs text-muted-foreground uppercase tracking-wider overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">
         <Link to="/" className="hover:text-accent transition-colors">Início</Link>
-        <span className="mx-2">›</span>
-        <Link to={`/categoria/${artigo.categories?.slug}`} className="hover:text-accent transition-colors">{artigo.categories?.nome}</Link>
+        {artigo.categories?.slug && <><span className="mx-2">›</span><Link to={`/categoria/${artigo.categories.slug}`} className="hover:text-accent transition-colors">{artigo.categories.nome}</Link></>}
         <span className="mx-2">›</span>
         <span className="text-foreground">{artigo.titulo}</span>
       </nav>
@@ -126,17 +127,14 @@ const ArtigoPage = () => {
             </div>
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Editoria</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
+              <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome || (manifesto ? "Manifesto" : "Editora Espectro")}</span>
             </div>
           </aside>
-          {/* Mobile "Mais Lidos" */}
-          <div className="md:hidden border-t border-border pt-6">
-            <MaisLidos />
-          </div>
-
-          <article className="flex-1 prose-editor text-foreground/85 overflow-hidden"
+          <article className="flex-1 prose-editor editorial-reading min-w-0 text-foreground/90"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentHtml) }}
           />
+
+          <div className="border-t border-border pt-6 md:hidden"><MaisLidos /></div>
 
           {/* Desktop sidebar */}
           <aside className="hidden md:block md:w-56 shrink-0 space-y-8 md:border-l md:border-border md:pl-8">
@@ -152,7 +150,7 @@ const ArtigoPage = () => {
             </div>
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Editoria</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
+              <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome || (manifesto ? "Manifesto" : "Editora Espectro")}</span>
             </div>
 
             <div className="border-t border-border pt-6">

@@ -30,9 +30,10 @@ export type MagazineArticle = {
   magazine_volumes?: MagazineVolume | null;
 };
 
-export function useVolumes(publishedOnly = false) {
+export function useVolumes(publishedOnly = false, enabled = true) {
   return useQuery({
     queryKey: ["magazine-volumes", publishedOnly],
+    enabled,
     queryFn: async () => {
       let query = supabase
         .from("magazine_volumes")
@@ -54,9 +55,10 @@ export function useVolume(slug: string) {
         .from("magazine_volumes")
         .select("*")
         .eq("slug", slug)
-        .single();
+        .eq("published", true)
+        .maybeSingle();
       if (error) throw error;
-      return data as MagazineVolume;
+      return data as MagazineVolume | null;
     },
     enabled: !!slug,
   });
@@ -70,7 +72,9 @@ export function useVolumeArticles(volumeId: string | undefined, publishedOnly = 
         .from("magazine_articles")
         .select("*")
         .eq("volume_id", volumeId!)
-        .order("ordem");
+        .order("ordem")
+        .order("created_at")
+        .order("id");
       if (publishedOnly) query = query.eq("published", true);
       const { data, error } = await query;
       if (error) throw error;
@@ -89,16 +93,20 @@ export function useMagazineArticle(volumeSlug: string, articleSlug: string) {
         .from("magazine_volumes")
         .select("*")
         .eq("slug", volumeSlug)
-        .single();
+        .eq("published", true)
+        .maybeSingle();
       if (vErr) throw vErr;
+      if (!volume) return null;
 
       const { data: article, error: aErr } = await supabase
         .from("magazine_articles")
         .select("*")
         .eq("volume_id", volume.id)
         .eq("slug", articleSlug)
-        .single();
+        .eq("published", true)
+        .maybeSingle();
       if (aErr) throw aErr;
+      if (!article) return null;
 
       return { ...article, magazine_volumes: volume } as MagazineArticle;
     },
@@ -106,20 +114,22 @@ export function useMagazineArticle(volumeSlug: string, articleSlug: string) {
   });
 }
 
-export function useAllMagazineArticlesBySection(secao: string) {
+export function usePublishedMagazineArticles(section?: string, enabled = true) {
   return useQuery({
-    queryKey: ["magazine-articles-section", secao],
+    queryKey: ["published-magazine-articles", section],
+    enabled,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("magazine_articles")
-        .select("*, magazine_volumes(*)")
-        .eq("secao", secao)
+        .select("*, magazine_volumes!inner(*)")
         .eq("published", true)
+        .eq("magazine_volumes.published", true)
         .order("created_at", { ascending: false });
+      if (section) query = query.eq("secao", section);
+      const { data, error } = await query;
       if (error) throw error;
       return data as MagazineArticle[];
     },
-    enabled: !!secao,
   });
 }
 
@@ -132,7 +142,12 @@ export function useCreateVolume() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["magazine-volumes"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["magazine-volumes"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-volume"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-article"] }),
+      qc.invalidateQueries({ queryKey: ["published-magazine-articles"] }),
+    ]),
   });
 }
 
@@ -144,7 +159,12 @@ export function useUpdateVolume() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["magazine-volumes"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["magazine-volumes"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-volume"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-article"] }),
+      qc.invalidateQueries({ queryKey: ["published-magazine-articles"] }),
+    ]),
   });
 }
 
@@ -155,7 +175,12 @@ export function useDeleteVolume() {
       const { error } = await supabase.from("magazine_volumes").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["magazine-volumes"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["magazine-volumes"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-volume"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-article"] }),
+      qc.invalidateQueries({ queryKey: ["published-magazine-articles"] }),
+    ]),
   });
 }
 
@@ -167,7 +192,11 @@ export function useCreateMagazineArticle() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["magazine-articles"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["magazine-articles"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-article"] }),
+      qc.invalidateQueries({ queryKey: ["published-magazine-articles"] }),
+    ]),
   });
 }
 
@@ -180,7 +209,11 @@ export function useUpdateMagazineArticle() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["magazine-articles"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["magazine-articles"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-article"] }),
+      qc.invalidateQueries({ queryKey: ["published-magazine-articles"] }),
+    ]),
   });
 }
 
@@ -191,7 +224,11 @@ export function useDeleteMagazineArticle() {
       const { error } = await supabase.from("magazine_articles").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["magazine-articles"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["magazine-articles"] }),
+      qc.invalidateQueries({ queryKey: ["magazine-article"] }),
+      qc.invalidateQueries({ queryKey: ["published-magazine-articles"] }),
+    ]),
   });
 }
 

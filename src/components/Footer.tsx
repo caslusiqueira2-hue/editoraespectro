@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Instagram } from "lucide-react";
+import { useSiteSetting } from "@/hooks/useSiteSettings";
 
 
 
@@ -8,6 +9,7 @@ const Footer = () => {
   const [clickCount, setClickCount] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
+  const { data: envioVisible } = useSiteSetting("envio_page_visible");
 
   const handleYearClick = () => {
     const next = clickCount + 1;
@@ -39,10 +41,11 @@ const Footer = () => {
               Uma editora de literatura, pensamento e cultura. Publicamos ensaios, poesia, ficção e resenhas.
             </p>
           </div>
-          <div className="flex items-start gap-6 sm:gap-8 text-xs uppercase tracking-widest text-muted-foreground">
-            <Link to="/envio" className="hover:text-accent transition-colors">
-              Envio
-            </Link>
+          <div className="flex flex-wrap items-start gap-6 sm:gap-8 text-xs uppercase tracking-widest text-muted-foreground">
+            <Link to="/revista" className="hover:text-accent transition-colors">Revista</Link>
+            {envioVisible !== false && (
+              <Link to="/envio" className="hover:text-accent transition-colors">Envio</Link>
+            )}
             <a href="mailto:espekeditora@gmail.com" className="hover:text-accent transition-colors">
               Contato
             </a>

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Subscriber {
@@ -26,29 +26,7 @@ export function useSubscribers() {
 export function useSubscribe() {
   return useMutation({
     mutationFn: async (email: string) => {
-      // Try to upsert — if already exists and unsubscribed, reactivate
-      const { data: existing } = await supabase
-        .from("newsletter_subscribers")
-        .select("id, status")
-        .eq("email", email.toLowerCase().trim())
-        .maybeSingle();
-
-      if (existing) {
-        if (existing.status === "active") {
-          throw new Error("Este e-mail já está inscrito.");
-        }
-        // Reactivate
-        const { error } = await supabase
-          .from("newsletter_subscribers")
-          .update({ status: "active", unsubscribed_at: null })
-          .eq("id", existing.id);
-        if (error) throw error;
-        return;
-      }
-
-      const { error } = await supabase
-        .from("newsletter_subscribers")
-        .insert({ email: email.toLowerCase().trim() });
+      const { error } = await supabase.rpc("subscribe_newsletter", { email_address: email });
       if (error) throw error;
     },
   });

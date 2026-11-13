@@ -17,11 +17,12 @@ export function useTrackPageView(
   contentId?: string
 ) {
   useEffect(() => {
-    if (!pagePath) return;
+    if (!pagePath || (["post", "category", "revista-volume", "revista-artigo"].includes(pageType) && !contentId)) return;
+    let cancelled = false;
 
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) return; // Admin — don't track
+      if (cancelled || session?.user) return; // Admin — don't track
 
       const visitorId = getVisitorId();
 
@@ -32,6 +33,7 @@ export function useTrackPageView(
         visitor_id: visitorId,
       });
       if (error) console.error("Failed to track page view:", error.message);
-    })();
+    })().catch((error) => console.error("Failed to track page view:", error));
+    return () => { cancelled = true; };
   }, [pagePath, pageType, contentId]);
 }

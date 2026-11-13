@@ -4,9 +4,10 @@ import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase
 
 export type Post = Tables<"posts"> & { categories: Tables<"categories"> | null };
 
-export function usePosts(publishedOnly = false) {
+export function usePosts(publishedOnly = false, enabled = true) {
   return useQuery({
     queryKey: ["posts", publishedOnly],
+    enabled,
     queryFn: async () => {
       let query = supabase
         .from("posts")
@@ -32,9 +33,10 @@ export function usePost(slug: string) {
         .from("posts")
         .select("*, categories(*)")
         .eq("slug", slug)
-        .single();
+        .eq("published", true)
+        .maybeSingle();
       if (error) throw error;
-      return data as Post;
+      return data as Post | null;
     },
     enabled: !!slug,
   });
@@ -62,7 +64,11 @@ export function useCreatePost() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["posts"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["posts"] }),
+      qc.invalidateQueries({ queryKey: ["post"] }),
+      qc.invalidateQueries({ queryKey: ["most-read"] }),
+    ]),
   });
 }
 
@@ -74,7 +80,11 @@ export function useUpdatePost() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["posts"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["posts"] }),
+      qc.invalidateQueries({ queryKey: ["post"] }),
+      qc.invalidateQueries({ queryKey: ["most-read"] }),
+    ]),
   });
 }
 
@@ -85,7 +95,11 @@ export function useDeletePost() {
       const { error } = await supabase.from("posts").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["posts"] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["posts"] }),
+      qc.invalidateQueries({ queryKey: ["post"] }),
+      qc.invalidateQueries({ queryKey: ["most-read"] }),
+    ]),
   });
 }
 

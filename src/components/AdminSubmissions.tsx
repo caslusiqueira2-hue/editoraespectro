@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Trash2, Download, ExternalLink, Mail, Calendar, FileText, Image } from "lucide-react";
+import EditorialStatus from "@/components/EditorialStatus";
+import { Trash2, Download, Mail, Calendar, FileText, Image } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -19,7 +20,7 @@ interface Submission {
 const AdminSubmissions = () => {
   const queryClient = useQueryClient();
 
-  const { data: submissions, isLoading } = useQuery({
+  const { data: submissions, isLoading, isError, refetch } = useQuery({
     queryKey: ["admin-submissions"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -43,11 +44,21 @@ const AdminSubmissions = () => {
     onError: () => toast.error("Erro ao remover submissão"),
   });
 
-  const getPublicUrl = (path: string) => {
-    const { data } = supabase.storage.from("submissions").getPublicUrl(path);
-    return data.publicUrl;
+  const downloadFile = async (path: string) => {
+    const { data, error } = await supabase.storage.from("submissions").download(path);
+    if (error || !data) {
+      toast.error("Não foi possível baixar este arquivo.");
+      return;
+    }
+    const url = URL.createObjectURL(data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = path.split("/").pop() || "original";
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
+  if (isError && !submissions) return <EditorialStatus retry={() => refetch()}>Não foi possível carregar os originais.</EditorialStatus>;
   if (isLoading) return <p className="text-muted-foreground">Carregando submissões…</p>;
 
   if (!submissions?.length) {
@@ -99,23 +110,17 @@ const AdminSubmissions = () => {
           )}
 
           <div className="flex flex-wrap gap-2">
-            <a
-              href={getPublicUrl(s.texto_url)}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button type="button" onClick={() => void downloadFile(s.texto_url)}
               className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent hover:underline bg-accent/10 px-3 py-1.5 rounded-full"
             >
-              <FileText size={14} /> Baixar texto <ExternalLink size={12} />
-            </a>
+              <FileText size={14} /> Baixar texto <Download size={12} />
+            </button>
             {s.foto_url && (
-              <a
-                href={getPublicUrl(s.foto_url)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button type="button" onClick={() => { if (s.foto_url) void downloadFile(s.foto_url); }}
                 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent hover:underline bg-accent/10 px-3 py-1.5 rounded-full"
               >
-                <Image size={14} /> Ver foto <ExternalLink size={12} />
-              </a>
+                <Image size={14} /> Baixar foto <Download size={12} />
+              </button>
             )}
           </div>
         </div>

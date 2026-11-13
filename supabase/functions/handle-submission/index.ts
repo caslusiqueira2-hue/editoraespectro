@@ -7,6 +7,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[character]!);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -39,11 +45,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Build download links
-    const textoUrl = `${supabaseUrl}/storage/v1/object/public/submissions/${submission.texto_url}`;
-    const fotoUrl = submission.foto_url
-      ? `${supabaseUrl}/storage/v1/object/public/submissions/${submission.foto_url}`
-      : null;
+    const siteUrl = Deno.env.get("SITE_URL");
+    const adminUrl = siteUrl ? new URL("/admin", siteUrl).href : null;
 
     const destinoLabel = submission.destino === "revista" ? "Revista" : "Site";
 
@@ -68,31 +71,30 @@ Deno.serve(async (req) => {
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr>
             <td style="padding: 8px 12px; font-weight: bold; color: #555; width: 120px;">Autor</td>
-            <td style="padding: 8px 12px;">${submission.nome}</td>
+            <td style="padding: 8px 12px;">${escapeHtml(submission.nome)}</td>
           </tr>
           <tr style="background: #f9f9f9;">
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">E-mail</td>
-            <td style="padding: 8px 12px;"><a href="mailto:${submission.email}">${submission.email}</a></td>
+            <td style="padding: 8px 12px;"><a href="mailto:${escapeHtml(submission.email)}">${escapeHtml(submission.email)}</a></td>
           </tr>
           <tr>
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">Gênero</td>
-            <td style="padding: 8px 12px;">${submission.genero}</td>
+            <td style="padding: 8px 12px;">${escapeHtml(submission.genero)}</td>
           </tr>
           <tr style="background: #f9f9f9;">
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">Título</td>
-            <td style="padding: 8px 12px;">${submission.titulo}</td>
+            <td style="padding: 8px 12px;">${escapeHtml(submission.titulo)}</td>
           </tr>
           ${submission.mensagem ? `
           <tr>
             <td style="padding: 8px 12px; font-weight: bold; color: #555;">Mensagem</td>
-            <td style="padding: 8px 12px;">${submission.mensagem}</td>
+            <td style="padding: 8px 12px;">${escapeHtml(submission.mensagem)}</td>
           </tr>
           ` : ""}
         </table>
         <div style="margin: 20px 0;">
-          <p><strong>Arquivos:</strong></p>
-          <p>📄 <a href="${textoUrl}" style="color: #2563eb;">Baixar texto</a></p>
-          ${fotoUrl ? `<p>🖼️ <a href="${fotoUrl}" style="color: #2563eb;">Ver foto do autor</a></p>` : ""}
+          <p>O texto e os anexos estão disponíveis no painel editorial.</p>
+          ${adminUrl ? `<p><a href="${escapeHtml(adminUrl)}">Abrir painel editorial</a></p>` : ""}
         </div>
         <p style="color: #888; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px;">
           Enviado em ${new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
@@ -101,16 +103,16 @@ Deno.serve(async (req) => {
     `;
 
     const { error: emailError } = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: Deno.env.get("SUBMISSIONS_FROM_EMAIL") ?? "onboarding@resend.dev",
       to: "espekeditora@gmail.com",
-      subject: `[${destinoLabel}] Nova submissão: "${submission.titulo}" — ${submission.nome}`,
+      subject: `[${destinoLabel}] Nova submissão: "${submission.titulo}" (${submission.nome})`,
       html: htmlBody,
-    });
+    }, { idempotencyKey: `submission-${submission_id}` });
 
     if (emailError) {
       console.error("Resend error:", emailError);
       return new Response(
-        JSON.stringify({ error: "Failed to send email", details: emailError.message }),
+        JSON.stringify({ error: "Failed to send email" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
