@@ -17,7 +17,7 @@ O frontend usa `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY`. Para valid
 
 ## Publicação
 
-O repositório usa o fallback de rotas do Vercel em `vercel.json`. Para publicar a revisão editorial em um ambiente existente, coordene o frontend e a atualização do Supabase na mesma janela:
+O repositório usa fallback de rotas em `vercel.json` (Vercel) e `public/_redirects` (Netlify). Para publicar a revisão editorial em um ambiente existente, coordene o frontend e a atualização do Supabase na mesma janela:
 
 1. Valide a migração `20261113162500_editorial_flows.sql` em um ambiente de teste. Ela cria as funções de inscrição e ranking, restringe a edição aos papéis do painel e torna privado o bucket de originais. Os links públicos antigos de originais deixam de funcionar quando a migração é aplicada. O painel passa a baixar os arquivos com a sessão do administrador.
 2. Aplique a migração e publique as Edge Functions `handle-submission` e `send-newsletter`. A função de aviso de submissão usa `RESEND_API_KEY` e aceita `SUBMISSIONS_FROM_EMAIL` para o remetente verificado. `SITE_URL` permite incluir no aviso um link para o painel editorial.
