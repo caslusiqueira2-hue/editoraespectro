@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import AnimatedSection from "@/components/AnimatedSection";
-import OptimizedImage from "@/components/OptimizedImage";
+import MagazineCover from "@/components/MagazineCover";
 import { useVolume, useVolumeArticles } from "@/hooks/useMagazine";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
@@ -62,10 +62,8 @@ const VolumePage = () => {
 
       <div className="editorial-wrap pt-6 sm:pt-10">
         <div className="grid items-center gap-7 border-y border-foreground py-6 sm:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] sm:gap-10">
-          {volume.capa_url && (
-            <OptimizedImage src={volume.capa_url} alt="" aspectRatio="3/4" priority containerClassName="max-w-[16rem]" className="object-contain" />
-          )}
-          <div className={volume.capa_url ? "min-w-0" : "min-w-0 sm:col-span-2"}>
+          <MagazineCover volume={volume} priority className="w-full max-w-[16rem]" />
+          <div className="min-w-0">
             <p className="editorial-label">Revista Espectro · Volume {volumeNumber(volume.numero)} · {volume.ano}</p>
             <h1 className="editorial-headline mt-4">{volume.titulo}</h1>
           </div>

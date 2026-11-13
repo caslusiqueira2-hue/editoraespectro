@@ -232,9 +232,6 @@ p.has-dropcap::first-letter,
     font-weight: 400;
     margin: .12em 0 .13em;
   }
-  .editorial-masthead-issue h1 {
-    font-size: clamp(3.5rem, 11vw, 10rem);
-  }
   .editorial-masthead > p:last-child {
     @apply text-xl italic text-muted-foreground sm:text-2xl;
     font-family: var(--font-body);
@@ -292,4 +289,177 @@ p.has-dropcap::first-letter,
 
 @media (prefers-reduced-motion: reduce) {
   body { transition: none; }
+}
+
+@layer components {
+  .magazine-masthead {
+    display: grid;
+    align-items: end;
+    gap: 1.35rem;
+  }
+
+  .magazine-masthead h1 {
+    font-size: clamp(3.4rem, 10vw, 8rem);
+    line-height: .86;
+    text-wrap: balance;
+  }
+
+  .magazine-masthead-tagline {
+    font-family: var(--font-body);
+    font-size: clamp(1.25rem, 2.5vw, 1.7rem);
+    font-style: italic;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .magazine-empty-art {
+    min-height: clamp(8rem, 25vw, 16rem);
+    background: #211a15 url("./assets/espectro-cover-art.jpg") 0% center / 300% auto no-repeat;
+  }
+
+  .magazine-masthead-image {
+    min-height: 6rem;
+    height: 100%;
+    background-color: #211a15;
+    background-size: cover;
+    background-position: center 47%;
+    border: 1px solid hsl(var(--border));
+  }
+
+  @media (min-width: 640px) {
+    .magazine-masthead {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: clamp(1rem, 4vw, 4rem);
+    }
+  }
+
+  .magazine-cover {
+    position: relative;
+    container-type: inline-size;
+    display: grid;
+    grid-template-rows: 26% minmax(0, 1fr) 13%;
+    aspect-ratio: 3 / 4;
+    padding: 0 5.5%;
+    border: 1px solid color-mix(in srgb, var(--cover-ink) 45%, var(--cover-paper));
+    background-color: var(--cover-paper);
+    color: var(--cover-ink);
+    box-shadow: 0 4px 13px #120d0a20;
+  }
+
+  .magazine-cover-heading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.8cqw;
+    padding-bottom: 1cqw;
+  }
+
+  .magazine-cover-heading > span, .magazine-cover-imprint {
+    font-family: var(--font-ui);
+    font-size: clamp(.625rem, 4cqw, 1rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .magazine-cover-heading > strong {
+    font-family: var(--font-display);
+    font-size: 19cqw;
+    font-weight: 400;
+    letter-spacing: -.035em;
+    line-height: .78;
+  }
+
+  .magazine-cover-art {
+    position: relative;
+    overflow: hidden;
+    border-block: 1px solid color-mix(in srgb, var(--cover-ink) 55%, var(--cover-paper));
+    background-color: var(--cover-paper);
+    background-image: url("./assets/espectro-cover-art.jpg");
+    background-size: 300% 100%;
+    background-position: var(--cover-position) center;
+  }
+
+  .magazine-cover-art > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: var(--cover-paper);
+  }
+
+  .magazine-cover-imprint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .25rem;
+    letter-spacing: .04em;
+  }
+
+  .reading-page {
+    max-width: 47rem;
+  }
+
+  .reading-crumbs, .reading-byline {
+    font-family: var(--font-ui);
+    font-size: .875rem;
+    overflow-wrap: anywhere;
+  }
+
+  .reading-crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .2rem .5rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .reading-crumbs a:hover {
+    text-decoration: underline;
+    text-underline-offset: .2em;
+  }
+
+  .reading-byline > span {
+    font-weight: 650;
+  }
+
+  .reading-subtitle, .reading-next {
+    font-family: var(--font-display);
+  }
+
+  .reading-illustration {
+    height: clamp(5.5rem, 20vw, 13rem);
+  }
+
+  .reading-copy {
+    max-width: 62ch;
+    margin-inline: auto;
+    color: hsl(var(--foreground) / .93);
+  }
+
+  .reading-poetry {
+    max-width: none;
+    text-align: start;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  .reading-poetry :is(p, div, blockquote) {
+    text-align: start;
+  }
+
+  .reading-poetry p {
+    margin-bottom: 1.1em;
+  }
+
+  .reading-after:empty {
+    display: none;
+  }
+
+  .reading-next {
+    display: block;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
 }
