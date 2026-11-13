@@ -3,7 +3,7 @@ import { useSubscribers } from "@/hooks/useNewsletter";
 import { Mail, Download, Users } from "lucide-react";
 
 export default function AdminNewsletter() {
-  const { data: subscribers, isLoading } = useSubscribers();
+  const { data: subscribers, isLoading, isError, refetch } = useSubscribers();
   const [showAll, setShowAll] = useState(false);
 
   const active = subscribers?.filter((s) => s.status === "active") || [];
@@ -13,9 +13,13 @@ export default function AdminNewsletter() {
   const exportCSV = () => {
     if (!subscribers) return;
     const header = "email,status,subscribed_at,unsubscribed_at";
-    const rows = subscribers.map(
-      (s) => `${s.email},${s.status},${s.subscribed_at},${s.unsubscribed_at || ""}`
-    );
+    const csvCell = (value: string) => {
+      const safeValue = /^[=+@\-\t\r\n]/.test(value) ? "'" + value : value;
+      return '"' + safeValue.replace(/"/g, '""') + '"';
+    };
+    const rows = subscribers.map((subscriber) => [
+      subscriber.email, subscriber.status, subscriber.subscribed_at, subscriber.unsubscribed_at || "",
+    ].map(csvCell).join(","));
     const csv = [header, ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -28,6 +32,8 @@ export default function AdminNewsletter() {
 
   if (isLoading) return <p className="text-muted-foreground text-sm">Carregando…</p>;
 
+  if (isError && !subscribers) return <div role="status"><p>Não foi possível carregar as inscrições.</p><button type="button" className="editorial-link mt-3" onClick={() => refetch()}>Tentar novamente</button></div>;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
@@ -36,6 +42,8 @@ export default function AdminNewsletter() {
           Frequência Espectro — Newsletter
         </h3>
       </div>
+
+      <p className="text-sm text-muted-foreground">A lista recebe inscrições. O envio automático de e-mails está indisponível.</p>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

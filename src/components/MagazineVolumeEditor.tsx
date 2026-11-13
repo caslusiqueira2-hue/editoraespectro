@@ -4,6 +4,7 @@ import type { MagazineVolume } from "@/hooks/useMagazine";
 import { toast } from "sonner";
 import { X, Upload } from "lucide-react";
 import RichEditor from "./RichEditor";
+import MagazineCover from "./MagazineCover";
 
 interface Props {
   volume: MagazineVolume | null;
@@ -35,7 +36,7 @@ const MagazineVolumeEditor = ({ volume, onClose }: Props) => {
     try {
       const url = await uploadMagazineImage(file);
       setCapaUrl(url);
-      toast.success("Capa enviada");
+      toast.success("Imagem da capa enviada");
     } catch (err: any) {
       toast.error("Erro: " + err.message);
     } finally {
@@ -88,22 +89,24 @@ const MagazineVolumeEditor = ({ volume, onClose }: Props) => {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 sm:py-10">
-        {/* Cover */}
-        <div className="mb-6">
-          {capaUrl ? (
-            <div className="relative group">
-              <img src={capaUrl} alt="Capa" className="w-full aspect-[3/4] max-w-xs object-cover rounded-xl" />
-              <button onClick={() => setCapaUrl("")}
-                className="absolute top-3 right-3 bg-background/80 text-foreground p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                <X size={16} />
-              </button>
-            </div>
-          ) : (
-            <label className="flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-xl py-8 cursor-pointer text-muted-foreground hover:border-accent hover:text-accent transition-colors text-sm max-w-xs">
-              <Upload size={18} /> {uploading ? "Enviando…" : "Adicionar capa"}
-              <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
+        <div className="mb-8">
+          <p className="editorial-label mb-3">Prévia da capa</p>
+          <MagazineCover volume={{ numero, ano, capa_url: capaUrl || null }} className="w-full max-w-[15rem]" />
+          <p className="mt-3 text-sm text-muted-foreground">
+            Envie a imagem da edição. A revista aplica o nome, o volume e o ano na moldura.
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+            <label className="editorial-link cursor-pointer focus-within:underline">
+              <Upload size={16} aria-hidden="true" />
+              {uploading ? "Enviando…" : capaUrl ? "Trocar imagem" : "Adicionar imagem"}
+              <input type="file" accept="image/*" onChange={handleCoverUpload} disabled={uploading} className="sr-only" />
             </label>
-          )}
+            {capaUrl && (
+              <button type="button" onClick={() => setCapaUrl("")} disabled={uploading} className="text-sm text-muted-foreground hover:underline">
+                Remover imagem
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Title */}

@@ -1,31 +1,28 @@
 import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import ReadingLayout from "@/components/ReadingLayout";
+import { ARTIGOS } from "@/data/artigos";
+import EditorialStatus from "@/components/EditorialStatus";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
 import { usePost } from "@/hooks/usePosts";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { sanitizeHtml } from "@/lib/sanitize";
 import MaisLidos from "@/components/MaisLidos";
-import OptimizedImage from "@/components/OptimizedImage";
 
 const ArtigoPage = () => {
-  const getOptimizedUrl = (url: string, width?: number) => {
-    if (!url.includes("supabase.co/storage/v1/object/public/")) return url;
-    const params = new URLSearchParams();
-    if (width) params.append("width", width.toString());
-    params.append("quality", "80");
-    params.append("format", "webp");
-    return `${url}?${params.toString()}`;
-  };
-
   const { slug } = useParams();
-  const { data: artigo, isLoading } = usePost(slug || "");
-  useTrackPageView(`/artigo/${slug}`, "post", artigo?.id);
+  const query = usePost(slug || "");
+  const manifesto = ARTIGOS.find((item) => item.slug === slug);
+  const artigo = query.data ?? (manifesto ? {
+    titulo: manifesto.titulo, subtitulo: manifesto.subtitulo, autor: manifesto.autor,
+    imagem_url: manifesto.imagem, conteudo: manifesto.conteudo,
+    created_at: "2026-02-21T12:00:00Z", categories: null,
+  } : undefined);
+  useTrackPageView(`/artigo/${slug}`, "post", query.data?.id);
   useDocumentTitle(artigo?.titulo);
 
-  if (isLoading) {
+  if (query.isLoading && !artigo) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
@@ -33,6 +30,10 @@ const ArtigoPage = () => {
         <Footer />
       </div>
     );
+  }
+
+  if (!artigo && query.isError) {
+    return <div className="flex min-h-screen flex-col"><Header /><main className="editorial-wrap flex-1 py-10"><EditorialStatus retry={() => query.refetch()}>Não foi possível carregar este texto.</EditorialStatus></main><Footer /></div>;
   }
 
   if (!artigo) {
@@ -56,13 +57,12 @@ const ArtigoPage = () => {
       ? (artigo.conteudo as string[]).map(block => {
           if (typeof block === "string" && block.startsWith("[IMG]")) {
             const url = block.replace("[IMG]", "").replace("[/IMG]", "");
-            const optimizedUrl = getOptimizedUrl(encodeURI(url), 1200);
-            return `<img src="${optimizedUrl}" loading="lazy" class="w-full rounded-lg shadow-lg my-8" />`;
+            return `<img src="${encodeURI(url).replace(/"/g, "&quot;")}" alt="" loading="lazy" />`;
           }
           if (typeof block === "string" && block.startsWith("**") && block.endsWith("**")) {
             return `<p><strong>${block.replace(/\*\*/g, "")}</strong></p>`;
           }
-          return `<p>${block}</p>`;
+          return typeof block === "string" ? `<p>${block}</p>` : "";
         }).join("")
       : "";
 
@@ -70,98 +70,24 @@ const ArtigoPage = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      {artigo.imagem_url && (
-        <div className="relative h-[35vh] sm:h-[50vh] min-h-[250px] sm:min-h-[350px] overflow-hidden">
-          <OptimizedImage 
-            src={artigo.imagem_url} 
-            alt={artigo.titulo} 
-            priority
-            containerClassName="absolute inset-0 w-full h-full"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        </div>
-      )}
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={`max-w-4xl mx-auto px-4 md:px-8 ${artigo.imagem_url ? "-mt-16 sm:-mt-20" : "mt-8 sm:mt-12"} relative z-10`}
+      <ReadingLayout
+        breadcrumbs={<>
+          <Link to="/">Início</Link>
+          {artigo.categories?.slug && (
+            <><span aria-hidden="true">/</span><Link to={`/categoria/${artigo.categories.slug}`}>{artigo.categories.nome}</Link></>
+          )}
+        </>}
+        section={artigo.categories?.nome || (manifesto ? "Manifesto" : "Editora Espectro")}
+        title={artigo.titulo}
+        subtitle={artigo.subtitulo}
+        author={artigo.autor}
+        date={artigo.created_at}
+        image={artigo.imagem_url}
+        poetry={artigo.categories?.slug === "poesia"}
+        content={contentHtml}
       >
-        <span className="inline-block text-[10px] font-bold uppercase tracking-[4px] text-accent mb-3">
-          {artigo.categories?.nome}
-        </span>
-        <h1 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-5xl font-bold leading-tight text-foreground">
-          {artigo.titulo}
-        </h1>
-        {artigo.subtitulo && (
-          <p className="mt-3 text-base sm:text-lg text-muted-foreground font-[family-name:var(--font-display)]">
-            {artigo.subtitulo}
-          </p>
-        )}
-      </motion.div>
-
-      {/* Breadcrumb */}
-      <nav className="max-w-4xl mx-auto px-4 md:px-8 mt-4 sm:mt-6 text-xs text-muted-foreground uppercase tracking-wider overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">
-        <Link to="/" className="hover:text-accent transition-colors">Início</Link>
-        <span className="mx-2">›</span>
-        <Link to={`/categoria/${artigo.categories?.slug}`} className="hover:text-accent transition-colors">{artigo.categories?.nome}</Link>
-        <span className="mx-2">›</span>
-        <span className="text-foreground">{artigo.titulo}</span>
-      </nav>
-
-      <main className="max-w-4xl mx-auto px-4 md:px-8 mt-8 sm:mt-10 mb-16 sm:mb-20">
-        <div className="flex flex-col md:flex-row gap-8 md:gap-12">
-          {/* Mobile meta */}
-          <aside className="md:hidden flex flex-wrap gap-6 pb-6 border-b border-border">
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Escrito por</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{artigo.autor}</span>
-            </div>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Publicado em</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">
-                {new Date(artigo.created_at).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}
-              </span>
-            </div>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Editoria</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
-            </div>
-          </aside>
-          {/* Mobile "Mais Lidos" */}
-          <div className="md:hidden border-t border-border pt-6">
-            <MaisLidos />
-          </div>
-
-          <article className="flex-1 prose-editor text-foreground/85 overflow-hidden"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentHtml) }}
-          />
-
-          {/* Desktop sidebar */}
-          <aside className="hidden md:block md:w-56 shrink-0 space-y-8 md:border-l md:border-border md:pl-8">
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Escrito por</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{artigo.autor}</span>
-            </div>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Publicado em</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">
-                {new Date(artigo.created_at).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}
-              </span>
-            </div>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Editoria</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{artigo.categories?.nome}</span>
-            </div>
-
-            <div className="border-t border-border pt-6">
-              <MaisLidos />
-            </div>
-          </aside>
-        </div>
-      </main>
-
+        <MaisLidos />
+      </ReadingLayout>
       <QuoteBar />
       <Footer />
     </div>

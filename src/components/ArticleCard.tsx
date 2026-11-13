@@ -1,42 +1,40 @@
 import { Link } from "react-router-dom";
+import { ArrowUpRight } from "lucide-react";
 import OptimizedImage from "./OptimizedImage";
 
 interface ArticleCardProps {
   artigo: {
     slug: string;
     titulo: string;
-    resumo: string;
+    resumo: string | null;
     categoria: string;
-    imagem: string;
+    imagem: string | null;
     autor: string;
   };
 }
 
-const ArticleCard = ({ artigo }: ArticleCardProps) => (
-  <article className="group">
-    <Link to={`/artigo/${artigo.slug}`} className="block">
-      <div className="aspect-[3/4] overflow-hidden rounded-xl bg-secondary relative">
-        <OptimizedImage
-          src={artigo.imagem}
-          alt={artigo.titulo}
-          aspectRatio="3/4"
-          className="group-hover:scale-110 transition-transform duration-700"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80" />
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <span className="inline-block text-[9px] font-bold uppercase tracking-[2px] text-accent mb-2">
-            {artigo.categoria}
-          </span>
-          <h3 className="font-[family-name:var(--font-display)] text-sm font-semibold leading-snug text-foreground">
-            {artigo.titulo}
-          </h3>
-          <div className="mt-2 text-[10px] text-muted-foreground uppercase tracking-wider">
-            {artigo.autor}
-          </div>
-        </div>
-      </div>
-    </Link>
-  </article>
-);
-
-export default ArticleCard;
+export default function ArticleCard({ artigo }: ArticleCardProps) {
+  return (
+    <article className="border-t border-border pt-4">
+      <Link to={`/artigo/${artigo.slug}`} className="group block">
+        {artigo.imagem && (
+          <OptimizedImage
+            src={artigo.imagem}
+            alt=""
+            aspectRatio="4/3"
+            className="motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-105"
+          />
+        )}
+        {artigo.categoria && <p className="editorial-label mt-4">{artigo.categoria}</p>}
+        <h3 className="mt-2 flex items-start justify-between gap-3 text-2xl leading-tight [overflow-wrap:anywhere] group-hover:text-accent sm:text-3xl">
+          {artigo.titulo}
+          <ArrowUpRight aria-hidden="true" className="mt-1 shrink-0 text-accent" size={18} />
+        </h3>
+        {artigo.resumo && (
+          <p className="mt-2 line-clamp-3 text-lg leading-snug text-muted-foreground">{artigo.resumo}</p>
+        )}
+        <p className="editorial-byline mt-4">{artigo.autor}</p>
+      </Link>
+    </article>
+  );
+}

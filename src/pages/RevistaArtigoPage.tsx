@@ -1,14 +1,14 @@
 import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import ReadingLayout from "@/components/ReadingLayout";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import EditorialStatus from "@/components/EditorialStatus";
+import { volumeNumber } from "@/lib/editorial";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QuoteBar from "@/components/QuoteBar";
-import AnimatedSection from "@/components/AnimatedSection";
-import OptimizedImage from "@/components/OptimizedImage";
 import { useMagazineArticle, useVolumeArticles } from "@/hooks/useMagazine";
 import { useTrackPageView } from "@/hooks/usePageTracking";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { sanitizeHtml } from "@/lib/sanitize";
 
 const SECTION_LABELS: Record<string, string> = {
   conto: "Conto",
@@ -17,23 +17,10 @@ const SECTION_LABELS: Record<string, string> = {
   resenha: "Resenha",
 };
 
-const toRoman = (n: number) => {
-  const numerals = [
-    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
-    [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
-    [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
-  ] as const;
-  let result = "";
-  let num = n;
-  for (const [value, symbol] of numerals) {
-    while (num >= value) { result += symbol; num -= value; }
-  }
-  return result;
-};
-
 const RevistaArtigoPage = () => {
   const { volumeSlug, artigoSlug } = useParams();
-  const { data: article, isLoading } = useMagazineArticle(volumeSlug || "", artigoSlug || "");
+  const query = useMagazineArticle(volumeSlug || "", artigoSlug || "");
+  const { data: article, isLoading } = query;
   const volume = article?.magazine_volumes;
   const { data: siblingArticles } = useVolumeArticles(volume?.id, true);
   useTrackPageView(`/revista/${volumeSlug}/${artigoSlug}`, "revista-artigo", article?.id);
@@ -47,6 +34,10 @@ const RevistaArtigoPage = () => {
         <Footer />
       </div>
     );
+  }
+
+  if (!article && query.isError) {
+    return <div className="flex min-h-screen flex-col"><Header /><main className="editorial-wrap flex-1 py-10"><EditorialStatus retry={() => query.refetch()}>Não foi possível carregar este texto da revista.</EditorialStatus></main><Footer /></div>;
   }
 
   if (!article || !volume) {
@@ -72,144 +63,41 @@ const RevistaArtigoPage = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      {article.imagem_url && (
-        <div className="relative h-[35vh] sm:h-[50vh] min-h-[250px] overflow-hidden">
-          <OptimizedImage 
-            src={article.imagem_url} 
-            alt={article.titulo} 
-            priority
-            containerClassName="absolute inset-0 w-full h-full"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        </div>
-      )}
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={`max-w-4xl mx-auto px-4 md:px-8 ${article.imagem_url ? "-mt-16 sm:-mt-20" : "mt-8 sm:mt-12"} relative z-10`}
+      <ReadingLayout
+        breadcrumbs={<>
+          <Link to="/revista">Revista</Link>
+          <span aria-hidden="true">/</span>
+          <Link to={`/revista/${volume.slug}`}>Volume {volumeNumber(volume.numero)} · {volume.titulo}</Link>
+        </>}
+        section={SECTION_LABELS[article.secao] || article.secao}
+        title={article.titulo}
+        author={article.autor}
+        image={article.imagem_url}
+        poetry={article.secao === "poesia"}
+        content={article.conteudo}
       >
-        <span className="inline-block text-[10px] font-bold uppercase tracking-[4px] text-accent mb-3 font-[family-name:var(--font-ui)]">
-          {SECTION_LABELS[article.secao] || article.secao}
-        </span>
-        <h1 className="font-[family-name:var(--font-display)] text-2xl sm:text-3xl md:text-5xl font-bold leading-tight text-foreground">
-          {article.titulo}
-        </h1>
-      </motion.div>
-
-      {/* Breadcrumb */}
-      <nav className="max-w-4xl mx-auto px-4 md:px-8 mt-4 sm:mt-6 text-xs text-muted-foreground uppercase tracking-wider overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">
-        <Link to="/" className="hover:text-accent transition-colors">Início</Link>
-        <span className="mx-2">›</span>
-        <Link to="/revista" className="hover:text-accent transition-colors">Revista</Link>
-        <span className="mx-2">›</span>
-        <Link to={`/revista/${volumeSlug}`} className="hover:text-accent transition-colors">
-          Volume {toRoman(volume.numero)}
-        </Link>
-        <span className="mx-2">›</span>
-        <span className="text-foreground">{article.titulo}</span>
-      </nav>
-
-      {/* Back to Sumário */}
-      <div className="max-w-4xl mx-auto px-4 md:px-8 mt-3">
-        <Link
-          to={`/revista/${volumeSlug}`}
-          className="inline-flex items-center gap-1 text-xs text-accent hover:underline font-[family-name:var(--font-ui)] uppercase tracking-wider"
-        >
-          ← Voltar para Sumário
-        </Link>
-      </div>
-
-      <main className="max-w-4xl mx-auto px-4 md:px-8 mt-8 sm:mt-10 mb-16 sm:mb-20">
-        <div className="flex flex-col md:flex-row gap-8 md:gap-12">
-          {/* Mobile meta */}
-          <aside className="md:hidden flex flex-wrap gap-6 pb-6 border-b border-border">
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Escrito por</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{article.autor}</span>
-            </div>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Seção</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{SECTION_LABELS[article.secao] || article.secao}</span>
-            </div>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Volume</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">
-                Vol. {toRoman(volume.numero)} — {volume.titulo}
-              </span>
-            </div>
-          </aside>
-
-          {/* Article content */}
-          <article
-            className="flex-1 prose-editor text-foreground/85 overflow-hidden"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.conteudo) }}
-          />
-
-          {/* Desktop sidebar */}
-          <aside className="hidden md:block md:w-56 shrink-0 space-y-8 md:border-l md:border-border md:pl-8">
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Escrito por</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{article.autor}</span>
-            </div>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Seção</span>
-              <span className="text-sm font-bold mt-1 block text-foreground">{SECTION_LABELS[article.secao] || article.secao}</span>
-            </div>
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block">Volume</span>
-              <Link to={`/revista/${volumeSlug}`} className="text-sm font-bold mt-1 block text-accent hover:underline">
-                Vol. {toRoman(volume.numero)} — {volume.titulo}
-              </Link>
-            </div>
-
-            {siblingArticles && siblingArticles.length > 1 && (
-              <div className="border-t border-border pt-6">
-                <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground block mb-3">
-                  Neste volume
-                </span>
-                <div className="space-y-2">
-                  {siblingArticles.filter(a => a.id !== article.id).slice(0, 6).map((a) => (
-                    <Link
-                      key={a.id}
-                      to={`/revista/${volumeSlug}/${a.slug}`}
-                      className="block text-sm text-muted-foreground hover:text-accent transition-colors leading-snug"
-                    >
-                      {a.titulo}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </aside>
-        </div>
-
-        {/* Prev/Next navigation */}
-        {(prevArticle || nextArticle) && (
-          <AnimatedSection>
-            <div className="mt-14 pt-8 border-t border-border flex justify-between gap-4">
-              {prevArticle ? (
-                <Link to={`/revista/${volumeSlug}/${prevArticle.slug}`} className="group text-left">
-                  <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground">← Anterior</span>
-                  <span className="block mt-1 text-sm font-[family-name:var(--font-display)] font-semibold text-foreground group-hover:text-accent transition-colors">
-                    {prevArticle.titulo}
-                  </span>
+        <nav aria-label="Continuar a leitura">
+          <Link to={`/revista/${volume.slug}`} className="editorial-link">
+            Voltar ao sumário
+          </Link>
+          {(prevArticle || nextArticle) && (
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:gap-8">
+              {prevArticle && (
+                <Link to={`/revista/${volume.slug}/${prevArticle.slug}`} className="reading-next group">
+                  <span className="editorial-byline flex items-center gap-2"><ArrowLeft size={14} aria-hidden="true" /> Anterior</span>
+                  <span className="mt-2 block text-xl leading-tight group-hover:text-accent sm:text-2xl">{prevArticle.titulo}</span>
                 </Link>
-              ) : <div />}
-              {nextArticle ? (
-                <Link to={`/revista/${volumeSlug}/${nextArticle.slug}`} className="group text-right">
-                  <span className="text-[9px] font-bold uppercase tracking-[3px] text-muted-foreground">Próximo →</span>
-                  <span className="block mt-1 text-sm font-[family-name:var(--font-display)] font-semibold text-foreground group-hover:text-accent transition-colors">
-                    {nextArticle.titulo}
-                  </span>
+              )}
+              {nextArticle && (
+                <Link to={`/revista/${volume.slug}/${nextArticle.slug}`} className="reading-next group col-start-2 text-right">
+                  <span className="editorial-byline flex items-center justify-end gap-2">Próximo <ArrowRight size={14} aria-hidden="true" /></span>
+                  <span className="mt-2 block text-xl leading-tight group-hover:text-accent sm:text-2xl">{nextArticle.titulo}</span>
                 </Link>
-              ) : <div />}
+              )}
             </div>
-          </AnimatedSection>
-        )}
-      </main>
-
+          )}
+        </nav>
+      </ReadingLayout>
       <QuoteBar />
       <Footer />
     </div>

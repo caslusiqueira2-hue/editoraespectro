@@ -332,6 +332,11 @@ export type Database = {
       get_current_admin_role: { Args: never; Returns: string }
       is_admin_email_allowed: { Args: { _email: string }; Returns: boolean }
       is_current_main_admin: { Args: never; Returns: boolean }
+      most_read_posts: {
+        Args: { result_limit: number }
+        Returns: { id: string; titulo: string; slug: string; categoria: string; views: number }[]
+      }
+      subscribe_newsletter: { Args: { email_address: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
